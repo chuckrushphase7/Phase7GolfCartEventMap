@@ -169,26 +169,27 @@ function drawGator(ctx, x, y, ev) {
   ctx.restore();
 }
 
-  function drawEvents(ctx) {
-    if (!ctx) return;
-    if (!eventsEnabled()) return;
+function drawEvents(ctx) {
+  if (!ctx) return;
+  if (!eventsEnabled()) return;
 
-    if (!Array.isArray(window.EVENTS)) refreshEventsFromTable();
+  if (!Array.isArray(window.EVENTS)) refreshEventsFromTable();
 
-    const evs = window.EVENTS || [];
-    for (const ev of evs) {
-      if (!isVisibleGator(ev)) continue;
-      const pos = getEventCoordinates(ev);
-      if (!pos) continue;
-     if (ev.type === "tiki") {
-  const size = 90;
-  ctx.drawImage(tikiImg, pos.x - size/2, pos.y - size/2, size, size);
-} else {
-  drawGator(ctx, pos.x, pos.y, ev);
-}
+  const evs = window.EVENTS || [];
+  for (const ev of evs) {
+    if (!(isVisibleGator(ev) || ev.type === "tiki")) continue;
+    const pos = getEventCoordinates(ev);
+    if (!pos) continue;
+
+    if (ev.type === "tiki") {
+      const size = 90;
+      ctx.drawImage(tikiImg, pos.x - size / 2, pos.y - size / 2, size, size);
+    } else {
+      drawGator(ctx, pos.x, pos.y, ev);
     }
   }
-  window.drawEvents = drawEvents;
+}
+window.drawEvents = drawEvents;
 
   function findEventAt(x, y) {
     if (!eventsEnabled()) return null;
@@ -201,7 +202,7 @@ function drawGator(ctx, x, y, ev) {
     let bestDist = thresholdSq;
 
     (window.EVENTS || []).forEach(ev => {
-      if (!isVisibleGator(ev)) return;
+if (!(isVisibleGator(ev) || ev.type === "tiki")) return;
       const pos = getEventCoordinates(ev);
       if (!pos) return;
 
