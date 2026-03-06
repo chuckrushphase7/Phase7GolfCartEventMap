@@ -1,4 +1,23 @@
+function norm(v) {
+  return String(v || "").trim().toLowerCase();
+}
 
+function features() {
+  return window.FEATURES || {};
+}
+
+function animationsEnabled() {
+  const f = features();
+  return f.animations !== false;
+}
+
+function eventsEnabled() {
+  const f = features();
+  return f.events !== false;
+}
+
+const tikiImg = new Image();
+tikiImg.src = "tikibar.png";
 const tikiImg = new Image();
 tikiImg.src = "tikibar.png";
   function typeEnabled(type) {
