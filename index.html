@@ -155,13 +155,19 @@ function updateToolbarLabels() {
 toggle.addEventListener("change", function () {
 
   if (toggle.checked) {
-    const entered = prompt("Resident access password:");
 
-		if (!entered || entered.trim() !== "parrotHead") {
-		  alert("Incorrect password");
-		  toggle.checked = false;
-		  return;
-		}
+    if (!sessionStorage.getItem("residentAuth")) {
+
+      const entered = prompt("Resident access password:");
+
+      if (!entered || entered.trim() !== "parrotHead") {
+        alert("Incorrect password");
+        toggle.checked = false;
+        return;
+      }
+
+      sessionStorage.setItem("residentAuth", "true");
+    }
 
     window.MODE = "resident";
 
