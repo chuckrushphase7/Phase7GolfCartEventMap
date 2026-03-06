@@ -18,7 +18,7 @@ function eventsEnabled() {
 
 const tikiImg = new Image();
 tikiImg.src = "tikibar.png";
-const tikiImg = new Image();
+
 tikiImg.src = "tikibar.png";
   function typeEnabled(type) {
     const f = features();
