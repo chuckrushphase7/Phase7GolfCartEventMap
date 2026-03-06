@@ -235,4 +235,3 @@ if (!(isVisibleGator(ev) || ev.type === "tiki")) return;
   window.buildEventPopupContent = buildEventPopupContent;
 
   refreshEventsFromTable();
-})();
