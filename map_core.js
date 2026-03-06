@@ -35,7 +35,7 @@ function safeInit() {
 }
 
 let PASSWORD = "Rudolf122025";
-let currentSeasonName = "Holiday Season";
+let currentSeasonName = "Special Event";
 
 let isSeasonOnly = true;
 let isUnlocked = false;
