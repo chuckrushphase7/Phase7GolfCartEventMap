@@ -181,7 +181,7 @@ function getCanvasXYFromClient(clientX, clientY) {
 
 // Layout-based zoom: resize canvas via CSS; keep canvas pixel space constant
 function setZoom(scale) {
-  zoomScale = Math.max(0.5, Math.min(2.5, scale));
+  zoomScale = Math.max(0.25, Math.min(2.5, scale));
   const c = document.getElementById("mapCanvas");
   if (!c || !c.width || !c.height) return;
   c.style.width = c.width * zoomScale + "px";
@@ -741,10 +741,16 @@ mapWrapper = document.getElementById("mapWrapper") || document.getElementById("w
 
   mapImg.onload = function () {
     console.log("Map image loaded:", mapImg.width, "x", mapImg.height);
-    canvas.width = mapImg.width;
-    canvas.height = mapImg.height;
-    setZoom(1,2);
-    safeDrawLots();
+canvas.width = mapImg.width;
+canvas.height = mapImg.height;
+
+const fitScale = Math.min(
+  mapWrapper.clientWidth / mapImg.width,
+  mapWrapper.clientHeight / mapImg.height
+);
+
+setZoom(Math.max(0.25, Math.min(2.5, fitScale)));
+safeDrawLots();
   };
 
   mapImg.onerror = function (e) {
