@@ -6,14 +6,14 @@ const EVENTS = [
   {
     id: "blue_guitar_scene",
     type: "santa",
-    label: "Santa & Sleigh at Blue Guitar Park",
+    label: "19th Hole Gathering",
     siteId: "BlueGuitarPark",     // must match mapped_sites.js
     phaseNumber: 7,
     isActive: true,
     requiresUnlock: false,
     seasons: [],                   // [] = all seasons, always visible
     description:
-      "Join us at Blue Guitar Park for a magical picture with Santa & Ms. Claus and their Sleigh."
+      description: "Join us at Blue Guitar Park for the Phase 7 Golf Event. Visit the Tiki Bar and enjoy the festivities."
   },
 
   // Global snow overlay tied to the same scene
