@@ -1,5 +1,6 @@
 
-
+const tikiImg = new Image();
+tikiImg.src = "tikibar.png";
   function typeEnabled(type) {
     const f = features();
     const map = f.eventTypes || null;

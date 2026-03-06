@@ -87,14 +87,11 @@ const EVENTS = [
     phaseNumber: 7,
     isActive: true,
     requiresUnlock: false,
-    seasons: [],                   // all seasons
+    seasons: [],
     description: "Wildlife reminder: use caution around water."
-  },
-];
-// Expose to the engine
+  }
 ];
 
-const tikiImg = new Image();
-tikiImg.src = "tikibar.png";
+// Expose to the engine
 window.EVENTS_TABLE = EVENTS;
 window.EVENTS = EVENTS; // optional, but harmless
