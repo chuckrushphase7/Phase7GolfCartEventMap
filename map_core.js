@@ -1,0 +1,798 @@
+// map_core.js
+// Core Phase 7 app logic: state, popups, map init, APK button.
+"use strict";
+
+console.log("MAP_CORE LOADED MARKER v3", new Date().toISOString());
+
+// Default events ON unless explicitly set to false somewhere else BEFORE this file loads
+window.ENABLE_EVENTS = (window.ENABLE_EVENTS !== false);
+window.setAppMode = function(mode) {
+
+  window.MODE = mode;
+
+  // Resident mode = unlocked
+  if (mode === "resident") {
+    isUnlocked = true;
+    isSeasonOnly = false;
+  }
+  // Event mode = locked
+  else {
+    isUnlocked = false;
+    isSeasonOnly = true;
+  }
+
+  updateLockStatusUI();
+
+  if (typeof safeDrawLots === "function") safeDrawLots();
+  else if (typeof drawLots === "function") drawLots();
+};
+function safeInit() {
+  try {
+    initMap();
+  } catch (e) {
+    console.error("initMap failed:", e);
+  }
+}
+
+let PASSWORD = "Rudolf122025";
+let currentSeasonName = "Holiday Season";
+
+let isSeasonOnly = true;
+let isUnlocked = false;
+window.ENABLE_SEASON_STATIONS = false;
+
+let canvas, ctx, mapImg, mapWrapper;
+
+document.addEventListener(
+  "click",
+  function (e) {
+    const el = document.elementFromPoint(e.clientX, e.clientY);
+    if (e.target.closest && e.target.closest(".popup-close")) {
+      console.log("CLICK TARGET is popup-close ✅", e.target);
+    } else if (el && el.closest && el.closest(".popup-close")) {
+      console.log("elementFromPoint is popup-close ✅", el);
+    } else {
+      console.log("CLICK landed on:", e.target, " elementFromPoint:", el);
+    }
+  },
+  true
+);
+
+function safeDrawLots() {
+  if (!ctx || !mapImg || !mapImg.complete || !mapImg.width) return;
+  try {
+    drawLots();
+  } catch (e) {
+    console.warn("safeDrawLots drawLots failed", e);
+  }
+}
+
+let zoomScale = 1;
+
+// LOTS from phase7_merged_lots.js
+const LOTS = typeof phaseResidentsData !== "undefined" ? phaseResidentsData : [];
+
+// ===============================
+// Shadow Golf Digitizer (holes + boundary + cart paths)
+// ===============================
+let DIGITIZE_MODE = false;
+let digitizeCourseId = null;
+
+let digitizeBoundary = [];
+let digitizeHoles = {};
+let digitizeNextHole = 1;
+
+let digitizePaths = {};
+let digitizeCurrentPath = null;
+
+// -----------------------------------
+// Popup/canvas click suppression (SINGLE source of truth)
+// -----------------------------------
+let suppressNextCanvasClickUntil = 0;
+
+function suppressCanvasClicks(ms = 350) {
+  suppressNextCanvasClickUntil = Date.now() + ms;
+}
+
+function isCanvasClickSuppressed() {
+  return Date.now() < suppressNextCanvasClickUntil;
+}
+
+// -----------------------------------
+// Popup hide (clean: just close + focus management)
+// -----------------------------------
+function hidePopup() {
+  const popup = document.getElementById("popup");
+  if (!popup) {
+    console.warn("hidePopup(): popup not found");
+    return;
+  }
+
+  if (document.activeElement && document.activeElement.blur) {
+    document.activeElement.blur();
+  }
+
+  popup.classList.add("hidden");
+  popup.setAttribute("aria-hidden", "true");
+  popup.style.display = "none";
+  popup.style.visibility = "hidden";
+  popup.style.pointerEvents = "none";
+
+  console.log("hidePopup(): forced hidden; display=", getComputedStyle(popup).display);
+}
+window.hidePopup = hidePopup;
+
+window.setDigitizeMode = function (on, opts = {}) {
+  DIGITIZE_MODE = !!on;
+  digitizeCourseId = opts.courseId != null ? opts.courseId : digitizeCourseId;
+  console.log("Digitize mode:", DIGITIZE_MODE ? "ON" : "OFF");
+};
+
+window.digitizeReset = function () {
+  digitizeBoundary = [];
+  digitizeHoles = {};
+  digitizeNextHole = 1;
+  digitizePaths = {};
+  digitizeCurrentPath = null;
+  console.log("Digitizer reset.");
+};
+
+window.digitizeSetNextHole = function (n) {
+  digitizeCurrentPath = null;
+  digitizeNextHole = Number(n) || 1;
+  console.log("Next hole:", digitizeNextHole);
+};
+
+window.digitizeStartPath = function (name) {
+  const nm = String(name || "").trim();
+  if (!nm) return;
+  digitizeCurrentPath = nm;
+  if (!digitizePaths[nm]) digitizePaths[nm] = [];
+  console.log("Digitizing path:", nm);
+};
+
+window.digitizeStopPath = function () {
+  digitizeCurrentPath = null;
+  console.log("Stopped path digitizing.");
+};
+
+window.digitizeExport = function () {
+  const payload = {
+    courseId: digitizeCourseId,
+    boundary: digitizeBoundary,
+    holes: digitizeHoles,
+    paths: digitizePaths,
+  };
+  console.log(JSON.stringify(payload, null, 2));
+  return payload;
+};
+
+// Map-wrapper aware coordinate conversion (preserves 1500x1500 pixel space)
+function getCanvasXYFromClient(clientX, clientY) {
+  const wrapRect = mapWrapper.getBoundingClientRect();
+  const xInWrap = clientX - wrapRect.left;
+  const yInWrap = clientY - wrapRect.top;
+
+  const xContent = (xInWrap + mapWrapper.scrollLeft) / zoomScale;
+  const yContent = (yInWrap + mapWrapper.scrollTop) / zoomScale;
+
+  return { x: xContent, y: yContent };
+}
+
+// Layout-based zoom: resize canvas via CSS; keep canvas pixel space constant
+function setZoom(scale) {
+  zoomScale = Math.max(0.5, Math.min(2.5, scale));
+  const c = document.getElementById("mapCanvas");
+  if (!c || !c.width || !c.height) return;
+  c.style.width = c.width * zoomScale + "px";
+  c.style.height = c.height * zoomScale + "px";
+}
+window.setZoom = setZoom;
+
+// ------------------------
+// Season + lock UI
+// ------------------------
+function getSeasonIcon(name) {
+  const lower = (name || "").toLowerCase();
+  if (lower.indexOf("halloween") >= 0) return "🎃";
+  if (lower.indexOf("christmas") >= 0) return "🎄";
+  if (lower.indexOf("holiday") >= 0) return "🎉";
+  if (lower.indexOf("light") >= 0) return "✨";
+  if (lower.indexOf("spring") >= 0) return "🌸";
+  if (lower.indexOf("summer") >= 0) return "☀️";
+  if (lower.indexOf("fall") >= 0 || lower.indexOf("autumn") >= 0) return "🍂";
+  return "⭐";
+}
+
+function updateSeasonToggleLabel() {
+  const span = document.getElementById("seasonOnlyLabel");
+  if (!span) return;
+  const icon = getSeasonIcon(currentSeasonName);
+  // You currently force "Event Only" — keeping your intent, but leaving icon unused
+  span.textContent = "Event Only";
+}
+
+function updateLockStatusUI() {
+  const el = document.getElementById("lockStatus");
+  if (!el) return;
+  el.textContent = isUnlocked ? "Full map unlocked (session only)" : "Season view only (privacy mode)";
+}
+
+// ------------------------
+// Fetch season + password (web only)
+// ------------------------
+function fetchSeasonName() {
+  fetch("season_name.txt")
+    .then(function (r) {
+      return r.text();
+    })
+    .then(function (text) {
+      const trimmed = text.trim();
+      if (trimmed) currentSeasonName = trimmed;
+      updateSeasonToggleLabel();
+    })
+    .catch(function () {
+      updateSeasonToggleLabel();
+    });
+}
+
+function fetchPassword() {
+  fetch("phase7_password.txt")
+    .then(function (r) {
+      return r.text();
+    })
+    .then(function (text) {
+      const trimmed = text.trim();
+      if (trimmed) PASSWORD = trimmed;
+      console.log("Password loaded from file.");
+    })
+    .catch(function (err) {
+      console.warn("Could not load phase7_password.txt, using default.", err);
+    });
+}
+
+// ------------------------
+// APK label + download
+// ------------------------
+function updateApkButtonLabel() {
+  if (typeof APK_LAST_UPDATED === "undefined") return;
+  const btn = document.getElementById("apkDownloadButton");
+  if (!btn) return;
+  btn.textContent = "Download Android App (" + APK_LAST_UPDATED + ")";
+}
+
+function handleAndroidDownloadClick() {
+  window.location.href = "https://chuckrushphase7.github.io/Phase7Data/Phase7Residents.apk";
+}
+window.handleAndroidDownloadClick = handleAndroidDownloadClick;
+
+// ------------------------
+// Privacy panel
+// ------------------------
+function setupPrivacyPanel() {
+  const btn = document.getElementById("privacyButton");
+  const panel = document.getElementById("privacyPanel");
+  const closeBtn = document.getElementById("privacyCloseButton");
+
+  if (!btn || !panel || !closeBtn) return;
+
+  btn.addEventListener("click", function () {
+    panel.classList.remove("hidden");
+  });
+
+  closeBtn.addEventListener("click", function () {
+    panel.classList.add("hidden");
+  });
+
+  panel.addEventListener("click", function (e) {
+    if (e.target === panel) panel.classList.add("hidden");
+  });
+}
+
+// ------------------------
+// Lot popup helpers
+// (these use helpers from draw_lots.js: isSeasonStation, getSeasonDetails, shouldShowLot)
+// ------------------------
+function buildPopupContent(lot) {
+  const seasonDetails = getSeasonDetails(lot);
+const mode = window.MODE || "resident";
+
+if (mode === "event") {
+  return `
+    <div class="popup-inner">
+      <h3>Lot ${lot.lotNumber}</h3>
+      <button class="popup-close" type="button">Close</button>
+    </div>
+  `;
+}
+  // Locked view
+  if (!isUnlocked) {
+    if (window.ENABLE_SEASON_STATIONS && isSeasonStation(lot)) {
+      return (
+        '<div class="popup-inner">' +
+        "<h3>" +
+        currentSeasonName +
+        " Station</h3>" +
+        (seasonDetails ? "<p>" + seasonDetails + "</p>" : "") +
+        '<button class="popup-close" type="button">Close</button>' +
+        "</div>"
+      );
+    }
+    return (
+      '<div class="popup-inner">' +
+      "<h3>" +
+      currentSeasonName +
+      " Map</h3>" +
+      '<button class="popup-close" type="button">Close</button>' +
+      "</div>"
+    );
+  }
+
+  // Full details view
+  const parts = [];
+
+  parts.push("<h3>Lot " + lot.lotNumber + "</h3>");
+
+  var pName = lot.primaryName || "";
+  var sName = lot.secondaryName || "";
+  if (pName) {
+    parts.push("<p><strong>" + (sName ? pName + " & " + sName : pName) + "</strong></p>");
+  }
+
+  if (lot.address) parts.push("<p>" + lot.address + "</p>");
+  if (lot.homeTypeStyle) parts.push("<p>Home: " + lot.homeTypeStyle + "</p>");
+  if (lot.contractStatus) parts.push("<p>Status: " + lot.contractStatus + "</p>");
+
+  if (lot.isSensitive) {
+    parts.push("<p><em>Details limited for privacy.</em></p>");
+  } else {
+    if (lot.originCityState) parts.push("<p>From: " + lot.originCityState + "</p>");
+    if (lot.phone) parts.push("<p>Phone: " + lot.phone + "</p>");
+    if (lot.notes) parts.push("<p>Notes: " + lot.notes + "</p>");
+  }
+
+  if (window.ENABLE_SEASON_STATIONS && isSeasonStation(lot) && seasonDetails) {
+    parts.push("<p><strong>" + currentSeasonName + " Station:</strong> " + seasonDetails + "</p>");
+  }
+
+  parts.push('<button class="popup-close" type="button">Close</button>');
+
+  return '<div class="popup-inner">' + parts.join("") + "</div>";
+}
+
+// ------------------------
+// Hit testing + tap handling
+// ------------------------
+function findLotAt(x, y) {
+  const threshold = 25;
+  const thresholdSq = threshold * threshold;
+  let best = null;
+  let bestDist = thresholdSq;
+
+  if (!Array.isArray(LOTS)) return null;
+
+  LOTS.forEach(function (lot) {
+    if (!shouldShowLot(lot)) return;
+
+    const lx = Number(lot.x);
+    const ly = Number(lot.y);
+    if (!Number.isFinite(lx) || !Number.isFinite(ly)) return;
+
+    const dx = x - lx;
+    const dy = y - ly;
+    const d2 = dx * dx + dy * dy;
+
+    if (d2 <= bestDist) {
+      bestDist = d2;
+      best = lot;
+    }
+  });
+
+  return best;
+}
+
+function wirePopupInterceptionAndClose(popup) {
+  if (!popup) return;
+
+  popup.onpointerdown = function (e) {
+    e.stopPropagation();
+  };
+  popup.onclick = function (e) {
+    e.stopPropagation();
+  };
+
+  const closeBtn = popup.querySelector(".popup-close");
+  if (closeBtn) {
+    closeBtn.onpointerdown = function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      if (e.stopImmediatePropagation) e.stopImmediatePropagation();
+      suppressCanvasClicks(350);
+    };
+
+    closeBtn.onclick = function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      if (e.stopImmediatePropagation) e.stopImmediatePropagation();
+      suppressCanvasClicks(350);
+      hidePopup();
+    };
+  }
+}
+
+function showpopup(lot, clientX, clientY) {
+  const popup = document.getElementById("popup");
+  if (!popup || !canvas || !mapWrapper) return;
+
+  const wrapperRect = mapWrapper.getBoundingClientRect();
+  const canvasRect = canvas.getBoundingClientRect();
+
+  popup.innerHTML = buildPopupContent(lot);
+  popup.classList.remove("hidden");
+  popup.setAttribute("aria-hidden", "false");
+  popup.style.display = "block";
+  popup.style.visibility = "visible";
+  popup.style.pointerEvents = "auto";
+  enforcePopupTopLayer();
+
+  console.log("SHOW LOT POPUP FIRED for lot:", lot && lot.lotNumber);
+  console.log(
+    "POPUP DEBUG:",
+    "closeBtn=",
+    !!popup.querySelector(".popup-close"),
+    "pointerEvents=",
+    getComputedStyle(popup).pointerEvents,
+    "zIndex=",
+    getComputedStyle(popup).zIndex
+  );
+
+  wirePopupInterceptionAndClose(popup);
+
+  const offsetX = canvasRect.left - wrapperRect.left;
+  const offsetY = canvasRect.top - wrapperRect.top;
+
+  let left = clientX - canvasRect.left + offsetX + 12;
+  let top = clientY - canvasRect.top + offsetY + 12;
+
+  popup.style.left = left + "px";
+  popup.style.top = top + "px";
+
+  const popupRect = popup.getBoundingClientRect();
+
+  if (window.innerWidth <= 768) {
+    left = (wrapperRect.width - popupRect.width) / 2;
+  }
+
+  const maxLeft = wrapperRect.width - popupRect.width - 8;
+  const maxTop = wrapperRect.height - popupRect.height - 8;
+
+  if (left < 8) left = 8;
+  if (left > maxLeft) left = maxLeft;
+  if (top < 8) top = 8;
+  if (top > maxTop) top = maxTop;
+
+  popup.style.left = left + "px";
+  popup.style.top = top + "px";
+}
+
+function showEventPopup(ev, clientX, clientY) {
+  const popup = document.getElementById("popup");
+  if (!popup || !canvas || !mapWrapper) return;
+
+  const wrapperRect = mapWrapper.getBoundingClientRect();
+  const canvasRect = canvas.getBoundingClientRect();
+
+  popup.innerHTML = buildEventPopupContent(ev);
+  popup.classList.remove("hidden");
+  popup.setAttribute("aria-hidden", "false");
+  popup.style.display = "block";
+  popup.style.visibility = "visible";
+  popup.style.pointerEvents = "auto";
+  enforcePopupTopLayer();
+
+  wirePopupInterceptionAndClose(popup);
+
+  const offsetX = canvasRect.left - wrapperRect.left;
+  const offsetY = canvasRect.top - wrapperRect.top;
+
+  let left = clientX - canvasRect.left + offsetX + 12;
+  let top = clientY - canvasRect.top + offsetY + 12;
+
+  popup.style.left = left + "px";
+  popup.style.top = top + "px";
+
+  const popupRect = popup.getBoundingClientRect();
+
+  if (window.innerWidth <= 768) {
+    left = (wrapperRect.width - popupRect.width) / 2;
+  }
+
+  const maxLeft = wrapperRect.width - popupRect.width - 8;
+  const maxTop = wrapperRect.height - popupRect.height - 8;
+
+  if (left < 8) left = 8;
+  if (left > maxLeft) left = maxLeft;
+  if (top < 8) top = 8;
+  if (top > maxTop) top = maxTop;
+
+  popup.style.left = left + "px";
+  popup.style.top = top + "px";
+}
+
+function handleCanvasTap(clientX, clientY, shiftLike = false) {
+  if (isCanvasClickSuppressed()) return;
+
+  const pt = getCanvasXYFromClient(clientX, clientY);
+  const cx = pt.x;
+  const cy = pt.y;
+
+  // Golf adjust mode
+  try {
+    if (window.GOLF_EDIT && window.GOLF_EDIT.enabled && window.GOLF_OVERLAY_DATA) {
+      const courseName = window.GOLF_ACTIVE_COURSE;
+      const courses = window.GOLF_OVERLAY_DATA.courses || [];
+      const course = courses.find((c) => c.course_name === courseName) || courses[0];
+      if (course) {
+        const hn = Number(window.GOLF_EDIT.hole_number || 1);
+        const target = window.GOLF_EDIT.target === "tee" ? "tee" : "flag";
+        const hole = (course.holes || []).find((h) => Number(h.hole_number) === hn);
+        if (hole) {
+          if (target === "tee") {
+            hole.tee_x = Math.round(cx);
+            hole.tee_y = Math.round(cy);
+            console.log("Set TEE for", course.course_name, "hole", hn, "=>", hole.tee_x, hole.tee_y);
+          } else {
+            hole.flag_x = Math.round(cx);
+            hole.flag_y = Math.round(cy);
+            console.log("Set FLAG for", course.course_name, "hole", hn, "=>", hole.flag_x, hole.flag_y);
+          }
+          safeDrawLots();
+          return;
+        }
+      }
+    }
+  } catch (e) {
+    console.warn("Golf adjust failed:", e);
+  }
+
+  // Digitizer
+  if (DIGITIZE_MODE) {
+    if (shiftLike) {
+      digitizeBoundary.push({ x: cx, y: cy });
+      console.log("Boundary:", { x: cx, y: cy });
+      return;
+    }
+
+    if (digitizeCurrentPath) {
+      digitizePaths[digitizeCurrentPath].push({ x: cx, y: cy });
+      console.log("Path point:", { x: cx, y: cy });
+      return;
+    }
+
+    const hn = String(digitizeNextHole);
+    digitizeHoles[hn] = { x: cx, y: cy };
+    console.log("Hole", hn, { x: cx, y: cy });
+    digitizeNextHole++;
+    return;
+  }
+
+  // 1) Events
+  if (window.ENABLE_EVENTS) {
+    const ev = findEventAt(cx, cy);
+    if (ev) {
+      showEventPopup(ev, clientX, clientY);
+      return;
+    }
+  }
+
+  // 2) Lots
+  const lot = findLotAt(cx, cy);
+  if (lot) {
+    showpopup(lot, clientX, clientY);
+  } else {
+    hidePopup();
+  }
+}
+
+function setupCanvasEvents() {
+  const target = document.getElementById("mapWrapper") || canvas;
+  if (!target) return;
+
+  target.addEventListener(
+    "click",
+    function (e) {
+      handleCanvasTap(e.clientX, e.clientY, !!e.shiftKey);
+    },
+    { passive: true }
+  );
+
+  let twoFinger = false;
+
+  target.addEventListener(
+    "touchstart",
+    function (e) {
+      twoFinger = e.touches && e.touches.length >= 2;
+    },
+    { passive: true }
+  );
+
+  target.addEventListener(
+    "touchend",
+    function (e) {
+      if (e.changedTouches && e.changedTouches.length > 0) {
+        const t = e.changedTouches[0];
+        handleCanvasTap(t.clientX, t.clientY, twoFinger);
+        twoFinger = false;
+      }
+    },
+    { passive: true }
+  );
+}
+
+// ------------------------
+// Season-only toggle
+// ------------------------
+function setupSeasonToggle() {
+  const checkbox = document.getElementById("seasonOnlyCheckbox");
+  if (!checkbox) return;
+
+  if (checkbox.dataset.bound === "1") return;
+  checkbox.dataset.bound = "1";
+
+  checkbox.checked = true;
+  isSeasonOnly = true;
+  updateLockStatusUI();
+  safeDrawLots();
+
+  checkbox.addEventListener("change", function () {
+    if (!isUnlocked && !checkbox.checked) {
+      const entered = window.prompt("Enter password to unlock full map:");
+      if (entered === PASSWORD) {
+        isUnlocked = true;
+        isSeasonOnly = false;
+      } else {
+        alert("Incorrect password. Staying in seasonal privacy mode.");
+        checkbox.checked = true;
+        isSeasonOnly = true;
+      }
+      updateLockStatusUI();
+      safeDrawLots();
+      return;
+    }
+
+    isSeasonOnly = checkbox.checked;
+    updateLockStatusUI();
+    safeDrawLots();
+  });
+}
+
+function enforcePopupTopLayer() {
+  const popup = document.getElementById("popup");
+  const wrap = document.getElementById("mapWrapper");
+  const canv = document.getElementById("mapCanvas");
+  if (!popup || !wrap || !canv) return;
+
+  const wrapStyle = getComputedStyle(wrap);
+  if (wrapStyle.position === "static") wrap.style.position = "relative";
+
+  canv.style.position = canv.style.position || "relative";
+  canv.style.zIndex = "1";
+
+  popup.style.position = "absolute";
+  popup.style.zIndex = "999999";
+  popup.style.pointerEvents = "auto";
+
+  const inner = popup.querySelector(".popup-inner");
+  if (inner) inner.style.pointerEvents = "auto";
+  const btn = popup.querySelector(".popup-close");
+  if (btn) btn.style.pointerEvents = "auto";
+}
+
+function setuppopupHandlersOnce() {
+  const popup = document.getElementById("popup");
+  if (!popup) return;
+
+  if (popup.dataset.bound === "1") return;
+  popup.dataset.bound = "1";
+
+  popup.style.pointerEvents = "auto";
+  popup.style.zIndex = popup.style.zIndex || "9999";
+
+  popup.addEventListener(
+    "pointerdown",
+    function (e) {
+      e.stopPropagation();
+
+      const btn = e.target.closest(".popup-close");
+      if (btn) {
+        e.preventDefault();
+        if (e.stopImmediatePropagation) e.stopImmediatePropagation();
+        suppressCanvasClicks(800);
+        console.log("POPUP CLOSE pointerdown fired");
+      }
+    },
+    true
+  );
+
+  popup.addEventListener(
+    "click",
+    function (e) {
+      e.stopPropagation();
+
+      const btn = e.target.closest(".popup-close");
+      if (btn) {
+        e.preventDefault();
+        if (e.stopImmediatePropagation) e.stopImmediatePropagation();
+        suppressCanvasClicks(800);
+        hidePopup();
+        console.log("POPUP CLOSE click fired");
+      }
+    },
+    true
+  );
+}
+
+// ------------------------
+// Map init
+// ------------------------
+function initMap() {
+  canvas = document.getElementById("mapCanvas");
+mapWrapper = document.getElementById("mapWrapper") || document.getElementById("wrap");
+  if (!canvas || !mapWrapper) {
+    console.error("Canvas or mapWrapper not found in DOM.");
+    return;
+  }
+
+  enforcePopupTopLayer();
+  setuppopupHandlersOnce();
+
+  ctx = canvas.getContext("2d");
+  mapImg = new Image();
+  mapImg.src = "Phase7Org.png";
+
+  mapImg.onload = function () {
+    console.log("Map image loaded:", mapImg.width, "x", mapImg.height);
+    canvas.width = mapImg.width;
+    canvas.height = mapImg.height;
+    setZoom(1);
+    safeDrawLots();
+  };
+
+  mapImg.onerror = function (e) {
+    console.error("FAILED to load map image Phase7Org.png", e);
+  };
+
+  setupCanvasEvents();
+}
+
+// ------------------------
+// Startup (SINGLE PATH)
+// ------------------------
+function boot() {
+  updateLockStatusUI();
+  updateApkButtonLabel();
+
+  const isWeb = location.protocol === "http:" || location.protocol === "https:";
+
+  if (isWeb) {
+    fetchSeasonName();
+    fetchPassword();
+  } else {
+    updateSeasonToggleLabel();
+    console.warn("Running from file:// - skipping season/password fetch.");
+  }
+
+  setupPrivacyPanel();
+  setupSeasonToggle();
+
+  // Ensure events default ON (and don't get disabled by undefined checks elsewhere)
+  if (typeof window.ENABLE_EVENTS === "undefined") window.ENABLE_EVENTS = true;
+
+  safeInit();
+}
+
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", boot);
+} else {
+  boot();
+}
