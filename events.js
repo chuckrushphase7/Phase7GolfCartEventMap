@@ -91,7 +91,6 @@ const EVENTS = [
     description: "Wildlife reminder: use caution around water."
   }
 ];
-
 // Expose to the engine
 window.EVENTS_TABLE = EVENTS;
 window.EVENTS = EVENTS; // optional, but harmless
