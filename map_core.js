@@ -643,7 +643,7 @@ function handleCanvasTap(clientX, clientY, shiftLike = false) {
   } else {
     hidePopup();
   }
-
+}
 
 function setupCanvasEvents() {
   const target = document.getElementById("mapWrapper") || canvas;
