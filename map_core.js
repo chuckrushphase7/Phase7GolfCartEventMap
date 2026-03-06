@@ -57,7 +57,59 @@ document.addEventListener(
   },
   true
 );
+function pointInPolygon(x, y, polygon) {
+  if (!Array.isArray(polygon) || polygon.length < 3) return false;
 
+  let inside = false;
+  for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
+    const xi = polygon[i][0], yi = polygon[i][1];
+    const xj = polygon[j][0], yj = polygon[j][1];
+
+    const intersect =
+      ((yi > y) !== (yj > y)) &&
+      (x < ((xj - xi) * (y - yi)) / ((yj - yi) || 1e-9) + xi);
+
+    if (intersect) inside = !inside;
+  }
+  return inside;
+}
+
+function findMappedSiteAt(x, y) {
+  const sites =
+    window.MAPPED_SITES ||
+    window.mapped_sites ||
+    window.MappedSites ||
+    [];
+
+  for (const site of sites) {
+    if (site.polygon && pointInPolygon(x, y, site.polygon)) {
+      return site;
+    }
+
+    if (site.bounds) {
+      if (
+        x >= site.bounds.minX &&
+        x <= site.bounds.maxX &&
+        y >= site.bounds.minY &&
+        y <= site.bounds.maxY
+      ) {
+        return site;
+      }
+    }
+  }
+
+  return null;
+}
+
+function findEventForSite(siteId) {
+  const events =
+    window.EVENTS ||
+    [];
+
+  return events.find(function (ev) {
+    return ev && ev.isActive && ev.siteId === siteId;
+  }) || null;
+}
 function safeDrawLots() {
   if (!ctx || !mapImg || !mapImg.complete || !mapImg.width) return;
   try {
@@ -572,11 +624,21 @@ function handleCanvasTap(clientX, clientY, shiftLike = false) {
       showEventPopup(ev, clientX, clientY);
       return;
     }
+
+    // Fallback: mapped site tap -> site event
+    const site = findMappedSiteAt(cx, cy);
+    if (site) {
+      const siteId = site.siteId || site.id || site.name;
+      const siteEvent = findEventForSite(siteId);
+      if (siteEvent) {
+        showEventPopup(siteEvent, clientX, clientY);
+        return;
+      }
+    }
   }
 
   // 2) Lots
   const lot = findLotAt(cx, cy);
-  if (lot) {
     showpopup(lot, clientX, clientY);
   } else {
     hidePopup();
