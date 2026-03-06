@@ -4,7 +4,7 @@ const MAPPED_SITES =
     "siteId": "BlueGuitarPark",
     "phaseNumber": 7,
     "type": "park",
-    "displayName": "Blue Guitar Park",
+    "displayName": "The 19th HOLE! join us at the TIKI Bar and other great activities",
     "polygon": [
       [758,1219],[765,1217],[772,1215],[778,1215],[783,1212],[785,1212],[790,1210],[798,1210],
       [802,1207],[804,1199],[801,1190],[801,1182],[797,1175],[797,1168],[794,1161],[794,1150],
