@@ -157,11 +157,11 @@ toggle.addEventListener("change", function () {
   if (toggle.checked) {
     const entered = prompt("Resident access password:");
 
-    if (entered.trim() !== "parrotHead") {
-      alert("Incorrect password");
-      toggle.checked = false;
-      return;
-    }
+		if (!entered || entered.trim() !== "parrotHead") {
+		  alert("Incorrect password");
+		  toggle.checked = false;
+		  return;
+		}
 
     window.MODE = "resident";
 
