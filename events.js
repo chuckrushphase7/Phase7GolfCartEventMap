@@ -5,7 +5,7 @@ const EVENTS = [
   // BLUE GUITAR PARK – single clear icon with rich popup text
   {
     id: "blue_guitar_scene",
-    type: "santa",
+    type: "tiki",
     label: "19th Hole Gathering",
     siteId: "BlueGuitarPark",     // must match mapped_sites.js
     phaseNumber: 7,
@@ -92,5 +92,9 @@ const EVENTS = [
   },
 ];
 // Expose to the engine
+];
+
+const tikiImg = new Image();
+tikiImg.src = "tikibar.png";
 window.EVENTS_TABLE = EVENTS;
 window.EVENTS = EVENTS; // optional, but harmless

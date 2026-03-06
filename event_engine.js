@@ -1,28 +1,4 @@
-// event_engine.js
-// Table-driven events (on-canvas; no DOM sprite drift) – clean build (v3)
-// - No center dot
-// - Emoji centered on marker
-// - Click radius controlled by window.EVENT_HIT_RADIUS (default 40)
 
-(function () {
-  "use strict";
-
-  window.shouldShowSnowOverlay = function () { return false; };
-  window.drawSnowOverlay = function () { };
-
-  function norm(s) { return String(s || "").toLowerCase().trim(); }
-  function features() { return window.FEATURES || {}; }
-
-  function eventsEnabled() {
-    if (window.ENABLE_EVENTS === false) return false;
-    if (window.FEATURES && window.FEATURES.events === false) return false;
-    return true;
-  }
-
-  function animationsEnabled() {
-    const f = features();
-    return f.animations !== false;
-  }
 
   function typeEnabled(type) {
     const f = features();
@@ -203,7 +179,12 @@ function drawGator(ctx, x, y, ev) {
       if (!isVisibleGator(ev)) continue;
       const pos = getEventCoordinates(ev);
       if (!pos) continue;
-      drawGator(ctx, pos.x, pos.y, ev);
+     if (ev.type === "tiki") {
+  const size = 90;
+  ctx.drawImage(tikiImg, pos.x - size/2, pos.y - size/2, size, size);
+} else {
+  drawGator(ctx, pos.x, pos.y, ev);
+}
     }
   }
   window.drawEvents = drawEvents;
