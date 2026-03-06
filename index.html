@@ -44,11 +44,11 @@
     }
 
     /* ✅ let canvas define its own layout size so overflow works */
-    #mapCanvas{
-      display:block;                 /* ✅ important for scrolling */
-      image-rendering:auto;
-      touch-action:none;
-    }
+		#mapCanvas{
+		  display:block;                 /* important for scrolling */
+		  image-rendering:auto;
+		  touch-action:manipulation;
+		}
 
     #popup{
       position:absolute;display:none;max-width:340px;background:white;border:1px solid #e5e7eb;border-radius:12px;
