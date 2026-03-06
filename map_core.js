@@ -639,6 +639,7 @@ function handleCanvasTap(clientX, clientY, shiftLike = false) {
 
   // 2) Lots
   const lot = findLotAt(cx, cy);
+  if (lot) {
     showpopup(lot, clientX, clientY);
   } else {
     hidePopup();
