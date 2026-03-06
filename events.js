@@ -12,7 +12,6 @@ const EVENTS = [
     isActive: true,
     requiresUnlock: false,
     seasons: [],                   // [] = all seasons, always visible
-    description:
       description: "Join us at Blue Guitar Park for the Phase 7 Golf Event. Visit the Tiki Bar and enjoy the festivities."
   },
 
