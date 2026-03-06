@@ -237,18 +237,7 @@ function fetchSeasonName() {
 }
 
 function fetchPassword() {
-  fetch("phase7_password.txt")
-    .then(function (r) {
-      return r.text();
-    })
-    .then(function (text) {
-      const trimmed = text.trim();
-      if (trimmed) PASSWORD = trimmed;
-      console.log("Password loaded from file.");
-    })
-    .catch(function (err) {
-      console.warn("Could not load phase7_password.txt, using default.", err);
-    });
+  // Password now hardcoded in UI prompt
 }
 
 // ------------------------
@@ -754,7 +743,7 @@ mapWrapper = document.getElementById("mapWrapper") || document.getElementById("w
     console.log("Map image loaded:", mapImg.width, "x", mapImg.height);
     canvas.width = mapImg.width;
     canvas.height = mapImg.height;
-    setZoom(1);
+    setZoom(1,2);
     safeDrawLots();
   };
 
