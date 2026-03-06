@@ -152,18 +152,33 @@ function updateToolbarLabels() {
       toggle.checked = (window.MODE === "resident");
       updateToolbarLabels();
 
-      toggle.addEventListener("change", function () {
-        window.MODE = toggle.checked ? "resident" : "event";
-        localStorage.setItem("PHASE7_MODE", window.MODE);
-        updateToolbarLabels();
+toggle.addEventListener("change", function () {
 
-        if (typeof window.setAppMode === "function") {
-          window.setAppMode(window.MODE);
-        } else {
-          if (typeof window.safeDrawLots === "function") window.safeDrawLots();
-          else if (typeof window.drawLots === "function") window.drawLots();
-        }
-      });
+  if (toggle.checked) {
+    const entered = prompt("Resident access password:");
+
+    if (entered !== "phase7") {
+      alert("Incorrect password");
+      toggle.checked = false;
+      return;
+    }
+
+    window.MODE = "resident";
+
+  } else {
+    window.MODE = "event";
+  }
+
+  updateToolbarLabels();
+
+  if (typeof window.setAppMode === "function") {
+    window.setAppMode(window.MODE);
+  } else {
+    if (typeof window.safeDrawLots === "function") window.safeDrawLots();
+    else if (typeof window.drawLots === "function") window.drawLots();
+  }
+
+});
     })();
   </script>
 <script>

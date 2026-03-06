@@ -3,7 +3,7 @@
 "use strict";
 
 console.log("MAP_CORE LOADED MARKER v3", new Date().toISOString());
-
+const RESIDENT_PASSWORD = "parrotHead";
 // Default events ON unless explicitly set to false somewhere else BEFORE this file loads
 window.ENABLE_EVENTS = (window.ENABLE_EVENTS !== false);
 window.setAppMode = function(mode) {
