@@ -506,8 +506,12 @@ ctx.textAlign = "center";
 ctx.textBaseline = "middle";
 
 const label = String(h.hole_number);
-const lx = fx + 16;
+const lx = fx + 12;
 const ly = fy;
+
+// Save exact label position for tap hit testing
+h._hit_x = lx;
+h._hit_y = ly;
 
 // White outline for readability
 ctx.lineWidth = 3;
@@ -517,7 +521,6 @@ ctx.strokeText(label, lx, ly);
 // Solid black text
 ctx.fillStyle = "rgba(0,0,0,1)";
 ctx.fillText(label, lx, ly);
-
 ctx.restore();
       }
 
