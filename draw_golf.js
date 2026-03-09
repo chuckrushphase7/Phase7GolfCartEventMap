@@ -502,11 +502,11 @@ if (isSel) {
 ctx.globalAlpha = alpha;
 
 ctx.font = "bold 20px system-ui, sans-serif";
-ctx.textAlign = "left";
+ctx.textAlign = "center";
 ctx.textBaseline = "middle";
 
 const label = String(h.hole_number);
-const lx = fx + 12;
+const lx = fx + 16;
 const ly = fy;
 
 // White outline for readability
