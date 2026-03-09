@@ -387,13 +387,18 @@ window.findGolfHoleAt = function (x, y) {
       courses.find(c => c.course_name === courseName || c.name === courseName) ||
       courses[0];
 
-    if (!course) return null;
+    if (!course) {
+      console.log("GOLF HIT: no active course");
+      return null;
+    }
 
     const holes = course.holes || [];
-    const hitRadius = 24; // a little more finger-friendly
+    const hitRadius = 28;
 
     let bestHole = null;
     let bestDistSq = Infinity;
+
+    console.log("GOLF HIT TEST click:", { x, y, course: course.course_name || course.name, holeCount: holes.length });
 
     for (const h of holes) {
       const tx = Number(h.tee_x);
@@ -408,11 +413,26 @@ window.findGolfHoleAt = function (x, y) {
       const dy = y - ly;
       const distSq = dx * dx + dy * dy;
 
+      console.log("GOLF HOLE CHECK", {
+        hole: h.hole_number,
+        hole_name: h.hole_name,
+        tee_x: tx,
+        tee_y: ty,
+        label_x: lx,
+        label_y: ly,
+        dist: Math.sqrt(distSq).toFixed(1)
+      });
+
       if (distSq <= hitRadius * hitRadius && distSq < bestDistSq) {
         bestHole = h;
         bestDistSq = distSq;
       }
     }
+
+    console.log("GOLF HIT RESULT:", bestHole ? {
+      hole: bestHole.hole_number,
+      hole_name: bestHole.hole_name
+    } : null);
 
     return bestHole;
   } catch (e) {
