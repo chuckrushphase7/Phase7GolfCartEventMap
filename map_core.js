@@ -641,12 +641,16 @@ function handleCanvasTap(clientX, clientY, shiftLike = false) {
 if (typeof window.findGolfHoleAt === "function") {
   const hole = window.findGolfHoleAt(cx, cy);
   if (hole) {
+    window.GOLF_SELECTED_HOLE = Number(hole.hole_number);
+
     // center map on the hole flag
     if (typeof centerMapOn === "function" && hole.flag_x != null && hole.flag_y != null) {
       centerMapOn(hole.flag_x, hole.flag_y);
     }
 
     const popup = document.getElementById("holePopup");
+    if (popup) popup.classList.add("hidden");
+
     const title = document.getElementById("holeTitle");
     const text = document.getElementById("holeText");
 
@@ -668,9 +672,13 @@ if (typeof window.findGolfHoleAt === "function") {
       }
 
       text.textContent = line;
-
       popup.classList.remove("hidden");
     }
+
+    if (typeof window.safeDrawLots === "function") {
+      window.safeDrawLots();
+    }
+
     return;
   }
 }

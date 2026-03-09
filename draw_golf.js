@@ -462,6 +462,18 @@ window.findGolfHoleAt = function (x, y) {
 
     // Hole markers (tee + flag) — selected hole flashes
     const holes = (course.holes || []);
+	const selectedHole = Number(window.GOLF_SELECTED_HOLE);
+
+for (const h of holes) {
+  const hn = Number(h.hole_number);
+
+  const isSel = (selectedHole != null) ? (hn === selectedHole) : false;
+
+  const tx = Number(h.tee_x);
+  const ty = Number(h.tee_y);
+
+  drawHoleMarker(ctx, tx, ty, isSel);
+}
     for (const h of holes) {
       const hn = Number(h.hole_number);
       if (!Number.isFinite(hn)) continue;
