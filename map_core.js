@@ -637,38 +637,43 @@ function handleCanvasTap(clientX, clientY, shiftLike = false) {
     }
   }
 
-  // 1.5) Golf holes
-  if (typeof window.findGolfHoleAt === "function") {
-    const hole = window.findGolfHoleAt(cx, cy);
-    if (hole) {
-      const popup = document.getElementById("holePopup");
-      const title = document.getElementById("holeTitle");
-      const text = document.getElementById("holeText");
-
-if (popup && title && text) {
-  const courseName = window.GOLF_ACTIVE_COURSE || "Golf Course";
-  const holeName = hole.holename || ("Hole " + hole.hole_number);
-
-  title.textContent = courseName + " - " + holeName;
-
-  let line = "";
-
-  if (hole.par != null) {
-    line += "Par " + hole.par;
-  }
-
-  if (hole.handicap != null) {
-    if (line) line += " • ";
-    line += "Handicap " + hole.handicap;
-  }
-
-  text.textContent = line;
-
-  popup.classList.remove("hidden");
-}
-      return;
+// 1.5) Golf holes
+if (typeof window.findGolfHoleAt === "function") {
+  const hole = window.findGolfHoleAt(cx, cy);
+  if (hole) {
+    // center map on the hole flag
+    if (typeof centerMapOn === "function" && hole.flag_x != null && hole.flag_y != null) {
+      centerMapOn(hole.flag_x, hole.flag_y);
     }
+
+    const popup = document.getElementById("holePopup");
+    const title = document.getElementById("holeTitle");
+    const text = document.getElementById("holeText");
+
+    if (popup && title && text) {
+      const courseName = window.GOLF_ACTIVE_COURSE || "Golf Course";
+      const holeName = hole.holename || ("Hole " + hole.hole_number);
+
+      title.textContent = courseName + " - " + holeName;
+
+      let line = "";
+
+      if (hole.par != null) {
+        line += "Par " + hole.par;
+      }
+
+      if (hole.handicap != null) {
+        if (line) line += " • ";
+        line += "Handicap " + hole.handicap;
+      }
+
+      text.textContent = line;
+
+      popup.classList.remove("hidden");
+    }
+    return;
   }
+}
 
   // 2) Lots
   const lot = findLotAt(cx, cy);
@@ -858,7 +863,15 @@ safeDrawLots();
 
   setupCanvasEvents();
 }
+function centerMapOn(x, y) {
+  const wrapper = document.getElementById("mapWrapper");
+  if (!wrapper) return;
 
+  const rect = wrapper.getBoundingClientRect();
+
+  wrapper.scrollLeft = Math.max(0, x * zoomScale - rect.width / 2);
+  wrapper.scrollTop = Math.max(0, y * zoomScale - rect.height / 2);
+}
 // ------------------------
 // Startup (SINGLE PATH)
 // ------------------------
