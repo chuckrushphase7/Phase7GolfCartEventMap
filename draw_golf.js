@@ -362,23 +362,23 @@ function drawHoleMarker(ctx, x, y, isSelected) {
   ctx.restore();
 }
 
-  function strokeRouteRoadStyle(ctx, pts, isSelected) {
-    // Build smoothed path
-    strokeSmoothPath(ctx, pts);
+function strokeRouteRoadStyle(ctx, pts, isSelected) {
+  // Build smoothed path
+  strokeSmoothPath(ctx, pts);
 
-    // Pass 1: dark base (reads like a road on the map)
-    ctx.strokeStyle = "rgba(0,0,0,0.55)";
-    ctx.lineWidth = isSelected ? SELECT_ROUTE_W : BASE_ROUTE_W;
-    ctx.lineCap = "round";
-    ctx.lineJoin = "round";
-    ctx.stroke();
+  // Pass 1: dark base underlay
+  ctx.strokeStyle = "rgba(0,0,0,0.45)";
+  ctx.lineWidth = isSelected ? SELECT_ROUTE_W : BASE_ROUTE_W;
+  ctx.lineCap = "round";
+  ctx.lineJoin = "round";
+  ctx.stroke();
 
-    // Pass 2: inner bright line (flashes when selected)
-    const innerAlpha = isSelected ? flashAlpha(FLASH_PERIOD_MS, 0.45, 0.95) : 0.65;
-    ctx.strokeStyle = `rgba(255,255,255,${innerAlpha})`;
-    ctx.lineWidth = isSelected ? SELECT_INNER_W : INNER_ROUTE_W;
-    ctx.stroke();
-  }
+  // Pass 2: bright yellow line
+  const innerAlpha = isSelected ? flashAlpha(FLASH_PERIOD_MS, 0.80, 1.00) : 0.95;
+  ctx.strokeStyle = `rgba(255,255,0,${innerAlpha})`;
+  ctx.lineWidth = isSelected ? (SELECT_INNER_W + 1) : (INNER_ROUTE_W + 1);
+  ctx.stroke();
+}
 window.findGolfHoleAt = function (x, y) {
   try {
     const courseName = window.GOLF_ACTIVE_COURSE;
