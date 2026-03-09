@@ -5,7 +5,7 @@ window.GOLF_OVERLAY_DATA = {
     {
       "course_name": "Lost Shaker of Salt",
       "course_color": "Red",
-      "holes": [
+      "holes": 
         [
   {
     "hole_number": 1,
