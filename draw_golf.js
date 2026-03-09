@@ -434,8 +434,6 @@ window.findGolfHoleAt = function (x, y) {
   return null;
 };
 
-  return null;
-};
 
   window.drawGolfOverlay = function (ctx) {
     const data = getData();
