@@ -520,7 +520,7 @@ ctx.strokeStyle = "rgba(255,255,255,0.85)";
 ctx.strokeText(label, lx, ly);
 
 // Solid black text
-ctx.fillStyle = "rgba(0,0,0,1)";
+ctx.fillStyle = "#ffff00";
 ctx.fillText(label, lx, ly);
 ctx.restore();
       }
