@@ -400,34 +400,24 @@ window.findGolfHoleAt = function (x, y) {
 
     console.log("GOLF HIT TEST click:", { x, y, course: course.course_name || course.name, holeCount: holes.length });
 
-    for (const h of holes) {
-      const tx = Number(h.tee_x);
-      const ty = Number(h.tee_y);
+for (const h of holes) {
+  const tx = Number(h.tee_x);
+  const ty = Number(h.tee_y);
 
-      const lx = Number.isFinite(Number(h.label_x)) ? Number(h.label_x) : tx;
-      const ly = Number.isFinite(Number(h.label_y)) ? Number(h.label_y) : ty;
+  const lx = Number.isFinite(Number(h.label_x)) ? Number(h.label_x) : tx;
+  const ly = Number.isFinite(Number(h.label_y)) ? Number(h.label_y) : ty;
 
-      if (!Number.isFinite(lx) || !Number.isFinite(ly)) continue;
+  // Save hit-test position (exact place where number is drawn)
+  h._hit_x = lx;
+  h._hit_y = ly;
 
-      const dx = x - lx;
-      const dy = y - ly;
-      const distSq = dx * dx + dy * dy;
+  // draw marker
+  drawHoleMarker(ctx, tx, ty, isSel);
 
-      console.log("GOLF HOLE CHECK", {
-        hole: h.hole_number,
-        hole_name: h.hole_name,
-        tee_x: tx,
-        tee_y: ty,
-        label_x: lx,
-        label_y: ly,
-        dist: Math.sqrt(distSq).toFixed(1)
-      });
-
-      if (distSq <= hitRadius * hitRadius && distSq < bestDistSq) {
-        bestHole = h;
-        bestDistSq = distSq;
-      }
-    }
+  // draw number
+  ctx.strokeText(label, lx, ly);
+  ctx.fillText(label, lx, ly);
+}
 
     console.log("GOLF HIT RESULT:", bestHole ? {
       hole: bestHole.hole_number,
