@@ -398,26 +398,30 @@ window.findGolfHoleAt = function (x, y) {
     let bestHole = null;
     let bestDistSq = Infinity;
 
-    console.log("GOLF HIT TEST click:", { x, y, course: course.course_name || course.name, holeCount: holes.length });
+    console.log("GOLF HIT TEST click:", {
+      x,
+      y,
+      course: course.course_name || course.name,
+      holeCount: holes.length
+    });
 
-for (const h of holes) {
-  const tx = Number(h.tee_x);
-  const ty = Number(h.tee_y);
+    for (const h of holes) {
+      const hx = Number(h._hit_x);
+      const hy = Number(h._hit_y);
 
-  const lx = Number.isFinite(Number(h.label_x)) ? Number(h.label_x) : tx;
-  const ly = Number.isFinite(Number(h.label_y)) ? Number(h.label_y) : ty;
+      if (!Number.isFinite(hx) || !Number.isFinite(hy)) {
+        continue;
+      }
 
-  // Save hit-test position (exact place where number is drawn)
-  h._hit_x = lx;
-  h._hit_y = ly;
+      const dx = x - hx;
+      const dy = y - hy;
+      const distSq = dx * dx + dy * dy;
 
-  // draw marker
-  drawHoleMarker(ctx, tx, ty, isSel);
-
-  // draw number
-  ctx.strokeText(label, lx, ly);
-  ctx.fillText(label, lx, ly);
-}
+      if (distSq <= hitRadius * hitRadius && distSq < bestDistSq) {
+        bestHole = h;
+        bestDistSq = distSq;
+      }
+    }
 
     console.log("GOLF HIT RESULT:", bestHole ? {
       hole: bestHole.hole_number,
