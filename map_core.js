@@ -646,7 +646,7 @@ function handleCanvasTap(clientX, clientY, shiftLike = false) {
       const text = document.getElementById("holeText");
 
       if (popup && title && text) {
-        const courseName = hole.course_name || hole.course || "Golf Course";
+const courseName = window.GOLF_ACTIVE_COURSE || hole.course_name || hole.course || "Golf Course";
         const holeName = hole.hole_name || ("Hole " + hole.hole_number);
         const parText = hole.par ? ("Par " + hole.par) : "";
 

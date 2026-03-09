@@ -393,7 +393,7 @@ window.findGolfHoleAt = function (x, y) {
     }
 
     const holes = course.holes || [];
-    const hitRadius = 28;
+    const hitRadius = 32;
 
     let bestHole = null;
     let bestDistSq = Infinity;
@@ -409,9 +409,7 @@ window.findGolfHoleAt = function (x, y) {
       const hx = Number(h._hit_x);
       const hy = Number(h._hit_y);
 
-      if (!Number.isFinite(hx) || !Number.isFinite(hy)) {
-        continue;
-      }
+      if (!Number.isFinite(hx) || !Number.isFinite(hy)) continue;
 
       const dx = x - hx;
       const dy = y - hy;
@@ -432,6 +430,9 @@ window.findGolfHoleAt = function (x, y) {
   } catch (e) {
     console.warn("Golf hole hit test failed:", e);
   }
+
+  return null;
+};
 
   return null;
 };
@@ -509,9 +510,12 @@ const label = String(h.hole_number);
 const lx = fx + 12;
 const ly = fy;
 
-// Save exact label position for tap hit testing
+// Save exact drawn label position for hit testing
 h._hit_x = lx;
 h._hit_y = ly;
+
+// White outline for readability
+ctx.lineWidth = 3;
 
 // White outline for readability
 ctx.lineWidth = 3;
