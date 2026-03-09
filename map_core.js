@@ -646,20 +646,21 @@ function handleCanvasTap(clientX, clientY, shiftLike = false) {
       const text = document.getElementById("holeText");
 
 if (popup && title && text) {
-  const courseName = window.GOLF_ACTIVE_COURSE || hole.course_name || hole.course || "Golf Course";
-  const holeName = hole.hole_name || ("Hole " + hole.hole_number);
+  console.log("HOLE POPUP DATA", hole);
+
+  const courseName = window.GOLF_ACTIVE_COURSE || "Golf Course";
+  const holeName = hole.holename || ("Hole " + hole.hole_number);
 
   const parText = hole.par ? ("Par " + hole.par) : "";
-  const handicapValue = hole.handicap ?? hole.hcp ?? hole.hole_handicap ?? "";
-  const handicapText = handicapValue ? ("Handicap " + handicapValue) : "";
+  const handicapText = hole.handicap ? ("Handicap " + hole.handicap) : "";
 
   title.textContent = courseName + " - " + holeName;
-console.log("HOLE POPUP DATA", hole);
-  const parts = [];
-  if (parText) parts.push(parText);
-  if (handicapText) parts.push(handicapText);
 
-  text.textContent = parts.join(" • ");
+  let line = parText;
+  if (parText && handicapText) line += " • ";
+  line += handicapText;
+
+  text.textContent = line;
 
   popup.classList.remove("hidden");
 }
