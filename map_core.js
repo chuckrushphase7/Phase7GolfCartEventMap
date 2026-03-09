@@ -646,19 +646,21 @@ function handleCanvasTap(clientX, clientY, shiftLike = false) {
       const text = document.getElementById("holeText");
 
 if (popup && title && text) {
-console.log("HOLE POPUP DATA FULL", JSON.stringify(hole, null, 2));
-
   const courseName = window.GOLF_ACTIVE_COURSE || "Golf Course";
   const holeName = hole.holename || ("Hole " + hole.hole_number);
 
-  const parText = hole.par ? ("Par " + hole.par) : "";
-  const handicapText = hole.handicap ? ("Handicap " + hole.handicap) : "";
-
   title.textContent = courseName + " - " + holeName;
 
-  let line = parText;
-  if (parText && handicapText) line += " • ";
-  line += handicapText;
+  let line = "";
+
+  if (hole.par != null) {
+    line += "Par " + hole.par;
+  }
+
+  if (hole.handicap != null) {
+    if (line) line += " • ";
+    line += "Handicap " + hole.handicap;
+  }
 
   text.textContent = line;
 

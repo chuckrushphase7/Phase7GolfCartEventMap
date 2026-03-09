@@ -6,60 +6,98 @@ window.GOLF_OVERLAY_DATA = {
       "course_name": "Lost Shaker of Salt",
       "course_color": "Red",
       "holes": [
-        {
-          "hole_number": 1,
-          "flag_x": 1180,
-          "flag_y": 645,
-          "holename": "Hole 1"
-        },
-        {
-          "hole_number": 2,
-          "flag_x": 1207,
-          "flag_y": 1138,
-          "holename": "Hole 2"
-        },
-        {
-          "hole_number": 3,
-          "flag_x": 1076,
-          "flag_y": 1156,
-          "holename": "Hole 3"
-        },
-        {
-          "hole_number": 4,
-          "flag_x": 994,
-          "flag_y": 1026,
-          "holename": "Hole 4"
-        },
-        {
-          "hole_number": 5,
-          "flag_x": 912,
-          "flag_y": 1038,
-          "holename": "Hole 5"
-        },
-        {
-          "hole_number": 6,
-          "flag_x": 826,
-          "flag_y": 1053,
-          "holename": "Hole 6"
-        },
-        {
-          "hole_number": 7,
-          "flag_x": 796,
-          "flag_y": 912,
-          "holename": "Hole 7"
-        },
-        {
-          "hole_number": 8,
-          "flag_x": 880,
-          "flag_y": 893,
-          "holename": "Hole 8"
-        },
-        {
-          "hole_number": 9,
-          "flag_x": 961,
-          "flag_y": 880,
-          "holename": "Hole 9"
-        }
+        [
+  {
+    "hole_number": 1,
+    "holename": "Hole 1",
+    "par": 3,
+    "handicap": 2,
+    "tee_x": null,
+    "tee_y": null,
+    "flag_x": 1180,
+    "flag_y": 645
+  },
+  {
+    "hole_number": 2,
+    "holename": "Hole 2",
+    "par": 3,
+    "handicap": 0,
+    "tee_x": null,
+    "tee_y": null,
+    "flag_x": 1207,
+    "flag_y": 1138
+  },
+  {
+    "hole_number": 3,
+    "holename": "Hole 3",
+    "par": 3,
+    "handicap": null,
+    "tee_x": null,
+    "tee_y": null,
+    "flag_x": 1076,
+    "flag_y": 1156
+  },
+  {
+    "hole_number": 4,
+    "holename": "Hole 4",
+    "par": 3,
+    "handicap": null,
+    "tee_x": null,
+    "tee_y": null,
+    "flag_x": 994,
+    "flag_y": 1026
+  },
+  {
+    "hole_number": 5,
+    "holename": "Hole 5",
+    "par": 3,
+    "handicap": null,
+    "tee_x": null,
+    "tee_y": null,
+    "flag_x": 912,
+    "flag_y": 1038
+  },
+  {
+    "hole_number": 6,
+    "holename": "Hole 6",
+    "par": 3,
+    "handicap": null,
+    "tee_x": null,
+    "tee_y": null,
+    "flag_x": 826,
+    "flag_y": 1053
+  },
+  {
+    "hole_number": 7,
+    "holename": "Hole 7",
+    "par": 3,
+    "handicap": null,
+    "tee_x": null,
+    "tee_y": null,
+    "flag_x": 796,
+    "flag_y": 912
+  },
+  {
+    "hole_number": 8,
+    "holename": "Hole 8",
+    "par": 3,
+    "handicap": null,
+    "tee_x": null,
+    "tee_y": null,
+    "flag_x": 880,
+    "flag_y": 893
+  },
+  {
+    "hole_number": 9,
+    "holename": "Hole 9",
+    "par": 3,
+    "handicap": null,
+    "tee_x": null,
+    "tee_y": null,
+    "flag_x": 961,
+    "flag_y": 880
+  }
+]
       ],
       "paths": {
         "main": [
