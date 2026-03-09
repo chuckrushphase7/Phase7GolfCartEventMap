@@ -637,12 +637,37 @@ function handleCanvasTap(clientX, clientY, shiftLike = false) {
     }
   }
 
+  // 1.5) Golf holes
+  if (typeof window.findGolfHoleAt === "function") {
+    const hole = window.findGolfHoleAt(cx, cy);
+    if (hole) {
+      const popup = document.getElementById("holePopup");
+      const title = document.getElementById("holeTitle");
+      const text = document.getElementById("holeText");
+
+      if (popup && title && text) {
+        const courseName = hole.course_name || hole.course || "Golf Course";
+        const holeName = hole.hole_name || ("Hole " + hole.hole_number);
+        const parText = hole.par ? ("Par " + hole.par) : "";
+
+        title.textContent = courseName + " - " + holeName;
+        text.textContent = parText;
+
+        popup.classList.remove("hidden");
+      }
+      return;
+    }
+  }
+
   // 2) Lots
   const lot = findLotAt(cx, cy);
   if (lot) {
     showpopup(lot, clientX, clientY);
   } else {
     hidePopup();
+
+    const popup = document.getElementById("holePopup");
+    if (popup) popup.classList.add("hidden");
   }
 }
 

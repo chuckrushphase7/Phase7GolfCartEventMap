@@ -69,6 +69,27 @@
     #popup h3{margin:0 0 6px 0;font-size:14px}
     #popup p{margin:0 0 6px 0;font-size:12px;line-height:1.35;color:#111827}
     #popup button{margin-top:8px}
+	.hole-popup {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(420px, 90vw);
+  max-height: 40vh;
+  background: rgba(0,0,0,0.85);
+  color: white;
+  border-radius: 10px;
+  z-index: 999;
+}
+
+.hole-popup-inner {
+  padding: 14px;
+  overflow-y: auto;
+}
+
+.hidden {
+  display: none;
+}
   </style>
 
   <script>
@@ -287,6 +308,11 @@ if ([...holeSel.options].some(o => o.value === "1")) {
     });
   })();
 </script>
-  
+  <div id="holePopup" class="hole-popup hidden">
+  <div class="hole-popup-inner">
+    <h3 id="holeTitle"></h3>
+    <div id="holeText"></div>
+  </div>
+</div>
 </body>
 </html>

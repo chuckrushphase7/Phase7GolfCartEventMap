@@ -379,6 +379,36 @@ function drawHoleMarker(ctx, x, y, isSelected) {
     ctx.lineWidth = isSelected ? SELECT_INNER_W : INNER_ROUTE_W;
     ctx.stroke();
   }
+  window.findGolfHoleAt = function (x, y) {
+  try {
+    const courseName = window.GOLF_ACTIVE_COURSE;
+    const courses = (window.GOLF_OVERLAY_DATA && window.GOLF_OVERLAY_DATA.courses) || [];
+    const course = courses.find(c => c.course_name === courseName || c.name === courseName) || courses[0];
+    if (!course) return null;
+
+    const holes = course.holes || [];
+    const hitRadius = 18;   // tap distance tolerance
+
+    for (const h of holes) {
+      const tx = Number(h.tee_x);
+      const ty = Number(h.tee_y);
+
+      if (!Number.isFinite(tx) || !Number.isFinite(ty)) continue;
+
+      const dx = x - tx;
+      const dy = y - ty;
+
+      if (dx * dx + dy * dy <= hitRadius * hitRadius) {
+        return h;
+      }
+    }
+
+  } catch (e) {
+    console.warn("Golf hole hit test failed:", e);
+  }
+
+  return null;
+};
 
   window.drawGolfOverlay = function (ctx) {
     const data = getData();
