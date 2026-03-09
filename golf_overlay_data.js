@@ -97,7 +97,7 @@ window.GOLF_OVERLAY_DATA = {
     "flag_x": 961,
     "flag_y": 880
   }
-]
+
       ],
       "paths": {
         "main": [
