@@ -448,7 +448,7 @@ window.findGolfHoleAt = function (x, y) {
     const course = data.courses.find(c => c.course_name === activeName) || data.courses[0];
     if (!course) return;
 
-    const selectedHole = getSelectedHoleNumber();
+  //   const selectedHole = getSelectedHoleNumber();
 
     // Main route (smoothed + simplified display)
     const ptsRaw = (course.paths && course.paths.main) ? course.paths.main : [];
