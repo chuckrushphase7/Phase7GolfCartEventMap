@@ -379,30 +379,42 @@ function drawHoleMarker(ctx, x, y, isSelected) {
     ctx.lineWidth = isSelected ? SELECT_INNER_W : INNER_ROUTE_W;
     ctx.stroke();
   }
-  window.findGolfHoleAt = function (x, y) {
+window.findGolfHoleAt = function (x, y) {
   try {
     const courseName = window.GOLF_ACTIVE_COURSE;
     const courses = (window.GOLF_OVERLAY_DATA && window.GOLF_OVERLAY_DATA.courses) || [];
-    const course = courses.find(c => c.course_name === courseName || c.name === courseName) || courses[0];
+    const course =
+      courses.find(c => c.course_name === courseName || c.name === courseName) ||
+      courses[0];
+
     if (!course) return null;
 
     const holes = course.holes || [];
-    const hitRadius = 18;   // tap distance tolerance
+    const hitRadius = 24; // a little more finger-friendly
+
+    let bestHole = null;
+    let bestDistSq = Infinity;
 
     for (const h of holes) {
       const tx = Number(h.tee_x);
       const ty = Number(h.tee_y);
 
-      if (!Number.isFinite(tx) || !Number.isFinite(ty)) continue;
+      const lx = Number.isFinite(Number(h.label_x)) ? Number(h.label_x) : tx;
+      const ly = Number.isFinite(Number(h.label_y)) ? Number(h.label_y) : ty;
 
-      const dx = x - tx;
-      const dy = y - ty;
+      if (!Number.isFinite(lx) || !Number.isFinite(ly)) continue;
 
-      if (dx * dx + dy * dy <= hitRadius * hitRadius) {
-        return h;
+      const dx = x - lx;
+      const dy = y - ly;
+      const distSq = dx * dx + dy * dy;
+
+      if (distSq <= hitRadius * hitRadius && distSq < bestDistSq) {
+        bestHole = h;
+        bestDistSq = distSq;
       }
     }
 
+    return bestHole;
   } catch (e) {
     console.warn("Golf hole hit test failed:", e);
   }
