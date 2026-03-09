@@ -393,7 +393,7 @@ window.findGolfHoleAt = function (x, y) {
     }
 
     const holes = course.holes || [];
-    const hitRadius = 32;
+    const hitRadius = 36;
 
     let bestHole = null;
     let bestDistSq = Infinity;
@@ -512,8 +512,7 @@ const ly = fy;
 h._hit_x = lx;
 h._hit_y = ly;
 
-// White outline for readability
-ctx.lineWidth = 3;
+
 
 // White outline for readability
 ctx.lineWidth = 3;

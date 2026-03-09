@@ -645,16 +645,24 @@ function handleCanvasTap(clientX, clientY, shiftLike = false) {
       const title = document.getElementById("holeTitle");
       const text = document.getElementById("holeText");
 
-      if (popup && title && text) {
-const courseName = window.GOLF_ACTIVE_COURSE || hole.course_name || hole.course || "Golf Course";
-        const holeName = hole.hole_name || ("Hole " + hole.hole_number);
-        const parText = hole.par ? ("Par " + hole.par) : "";
+if (popup && title && text) {
+  const courseName = window.GOLF_ACTIVE_COURSE || hole.course_name || hole.course || "Golf Course";
+  const holeName = hole.hole_name || ("Hole " + hole.hole_number);
 
-        title.textContent = courseName + " - " + holeName;
-        text.textContent = parText;
+  const parText = hole.par ? ("Par " + hole.par) : "";
+  const handicapValue = hole.handicap ?? hole.hcp ?? hole.hole_handicap ?? "";
+  const handicapText = handicapValue ? ("Handicap " + handicapValue) : "";
 
-        popup.classList.remove("hidden");
-      }
+  title.textContent = courseName + " - " + holeName;
+
+  const parts = [];
+  if (parText) parts.push(parText);
+  if (handicapText) parts.push(handicapText);
+
+  text.textContent = parts.join(" • ");
+
+  popup.classList.remove("hidden");
+}
       return;
     }
   }
