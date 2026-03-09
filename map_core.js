@@ -654,7 +654,7 @@ if (popup && title && text) {
   const handicapText = handicapValue ? ("Handicap " + handicapValue) : "";
 
   title.textContent = courseName + " - " + holeName;
-
+console.log("HOLE POPUP DATA", hole);
   const parts = [];
   if (parText) parts.push(parText);
   if (handicapText) parts.push(handicapText);
