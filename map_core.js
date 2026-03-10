@@ -647,32 +647,35 @@ if (typeof window.findGolfHoleAt === "function") {
       centerMapOn(hole.flag_x, hole.flag_y);
     }
 
-    const popup = document.getElementById("holePopup");
-    const title = document.getElementById("holeTitle");
-    const text = document.getElementById("holeText");
+const popup = document.getElementById("holePopup");
+const title = document.getElementById("holeTitle");
+const text = document.getElementById("holeText");
 
-    if (popup && title && text) {
-      const courseName = window.GOLF_ACTIVE_COURSE || "Golf Course";
-      const holeName = hole.holename || ("Hole " + hole.hole_number);
+if (popup && title && text) {
 
-      title.textContent = courseName + " - " + holeName;
+  const courseName = window.GOLF_ACTIVE_COURSE || "Golf Course";
+  const holeName = hole.holename || ("Hole " + hole.hole_number);
 
-      let line = "";
-      if (hole.par != null) line += "Par " + hole.par;
-      if (hole.handicap != null) {
-        if (line) line += " • ";
-        line += "Handicap " + hole.handicap;
-      }
-      text.textContent = line;
+  title.textContent = courseName + " - " + holeName;
 
-      popup.classList.remove("hidden");
-      popup.style.display = "block";
+  let line = "";
 
-      console.log("HOLE POPUP SHOW", {
-        className: popup.className,
-        display: getComputedStyle(popup).display
-      });
-    }
+  if (hole.par != null) {
+    line += "Par " + hole.par;
+  }
+
+  if (hole.handicap != null) {
+    if (line) line += " • ";
+    line += "Handicap " + hole.handicap;
+  }
+
+  text.textContent = line;
+
+  popup.classList.remove("hidden");
+  popup.style.display = "block";
+  popup.style.visibility = "visible";
+  popup.style.pointerEvents = "auto";
+}
 
     if (typeof window.safeDrawLots === "function") {
       window.safeDrawLots();
