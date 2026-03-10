@@ -884,7 +884,7 @@ safeDrawLots();
 function centerMapOn(x, y) {
   const wrapper = document.getElementById("mapWrapper");
   if (!wrapper) return;
-
+        console.log("Center Map On Function");
   const rect = wrapper.getBoundingClientRect();
 
   wrapper.scrollLeft = Math.max(0, x * zoomScale - rect.width / 2);
