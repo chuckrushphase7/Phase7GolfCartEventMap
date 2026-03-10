@@ -677,9 +677,9 @@ if (popup && title && text) {
   popup.style.pointerEvents = "auto";
 }
 
-    if (typeof window.safeDrawLots === "function") {
-      window.safeDrawLots();
-    }
+  //  if (typeof window.safeDrawLots === "function") {
+  //    window.safeDrawLots();
+  //  }
 
     return;
   }
