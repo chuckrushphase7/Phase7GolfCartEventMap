@@ -659,7 +659,14 @@ if (typeof window.findGolfHoleAt === "function") {
       const holeName = hole.holename || ("Hole " + hole.hole_number);
 
       title.textContent = courseName + " - " + holeName;
-
+console.log("HOLE POPUP SHOW", {
+  className: popup.className,
+  display: getComputedStyle(popup).display,
+  visibility: getComputedStyle(popup).visibility,
+  opacity: getComputedStyle(popup).opacity,
+  zIndex: getComputedStyle(popup).zIndex,
+  bottom: getComputedStyle(popup).bottom
+});
       let line = "";
 
       if (hole.par != null) {
