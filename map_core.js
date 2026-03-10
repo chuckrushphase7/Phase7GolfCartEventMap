@@ -680,7 +680,7 @@ if (popup && title && text) {
   //  if (typeof window.safeDrawLots === "function") {
   //    window.safeDrawLots();
   //  }
-
+console.log("hole popup class after show", popup.className, popup.style.display);
     return;
   }
 }
