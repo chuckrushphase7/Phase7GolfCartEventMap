@@ -641,41 +641,54 @@ function handleCanvasTap(clientX, clientY, shiftLike = false) {
 if (typeof window.findGolfHoleAt === "function") {
   const hole = window.findGolfHoleAt(cx, cy);
   if (hole) {
+    // Remember selected hole so draw_golf.js can highlight it
+    window.GOLF_SELECTED_HOLE_ID = hole.id || hole.hole_number;
+    window.GOLF_SELECTED_HOLE = hole;
 
-const popup = document.getElementById("holePopup");
-const title = document.getElementById("holeTitle");
-const text = document.getElementById("holeText");
+    // Center map on the hole if helper exists
+    if (typeof window.centerMapOn === "function") {
+      window.centerMapOn(hole.flag_x, hole.flag_y);
+    }
 
-if (popup && title && text) {
+    // Show popup
+    const popup = document.getElementById("holePopup");
+    const title = document.getElementById("holeTitle");
+    const text = document.getElementById("holeText");
 
-  const courseName = window.GOLF_ACTIVE_COURSE || "Golf Course";
-  const holeName = hole.holename || ("Hole " + hole.hole_number);
+    if (popup && title && text) {
+      const courseName = window.GOLF_ACTIVE_COURSE || "Golf Course";
+      const holeName = hole.holename || ("Hole " + hole.hole_number);
 
-  title.textContent = courseName + " - " + holeName;
+      title.textContent = courseName + " - " + holeName;
 
-  let line = "";
+      let line = "";
+      if (hole.par != null) {
+        line += "Par " + hole.par;
+      }
+      if (hole.handicap != null) {
+        if (line) line += " • ";
+        line += "Handicap " + hole.handicap;
+      }
 
-  if (hole.par != null) {
-    line += "Par " + hole.par;
-  }
+      text.textContent = line || "";
 
-  if (hole.handicap != null) {
-    if (line) line += " • ";
-    line += "Handicap " + hole.handicap;
-  }
+      popup.classList.remove("hidden");
+      popup.style.display = "block";
+      popup.style.visibility = "visible";
+      popup.style.pointerEvents = "auto";
+    }
 
-  text.textContent = line;
+    // Redraw after selection so highlight appears
+    if (typeof window.safeDrawGolf === "function") {
+      window.safeDrawGolf();
+    }
 
-  popup.classList.remove("hidden");
-  popup.style.display = "block";
-  popup.style.visibility = "visible";
-  popup.style.pointerEvents = "auto";
-}
+    console.log(
+      "hole popup class after show",
+      popup ? popup.className : "(no popup)",
+      popup ? popup.style.display : "(no popup)"
+    );
 
-  //  if (typeof window.safeDrawLots === "function") {
-  //    window.safeDrawLots();
-  //  }
-console.log("hole popup class after show", popup.className, popup.style.display);
     return;
   }
 }
