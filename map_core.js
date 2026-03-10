@@ -641,10 +641,11 @@ function handleCanvasTap(clientX, clientY, shiftLike = false) {
 if (typeof window.findGolfHoleAt === "function") {
   const hole = window.findGolfHoleAt(cx, cy);
   if (hole) {
-    window.GOLF_SELECTED_HOLE = Number(hole.hole_number);
-
-    if (typeof centerMapOn === "function" && hole.flag_x != null && hole.flag_y != null) {
-      centerMapOn(hole.flag_x, hole.flag_y);
+  <div id="holePopup" class="hole-popup hidden">
+  <div class="hole-popup-inner">
+    <h3 id="holeTitle"></h3>
+    <div id="holeText"></div>
+  </div>      centerMapOn(hole.flag_x, hole.flag_y);
     }
 
 const popup = document.getElementById("holePopup");
