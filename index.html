@@ -161,6 +161,10 @@
 .hole-popup:not(.hidden) {
   display: block !important;
 }
+  
+    .vv-anchored{
+      will-change: transform, width, left, top;
+    }
   </style>
 
   <script>
@@ -408,5 +412,58 @@ toggle.addEventListener("change", function () {
     <div id="holeText"></div>
   </div>
 </div>
+
+<script>
+(function () {
+  function syncViewportUI() {
+    var vv = window.visualViewport;
+    var toolbar = document.getElementById("toolbar");
+    var popup = document.getElementById("holePopup");
+    if (!toolbar) return;
+
+    toolbar.classList.add("vv-anchored");
+    if (popup) popup.classList.add("vv-anchored");
+
+    if (!vv) return;
+
+    // Keep toolbar locked to visible viewport during pinch-zoom/pan.
+    toolbar.style.position = "fixed";
+    toolbar.style.left = vv.offsetLeft + "px";
+    toolbar.style.top = vv.offsetTop + "px";
+    toolbar.style.width = vv.width + "px";
+    toolbar.style.transform = "translate(0,0)";
+
+    // Keep popup directly under the toolbar, not at bottom.
+    if (popup) {
+      var toolbarH = toolbar.getBoundingClientRect().height || toolbar.offsetHeight || 72;
+      popup.style.position = "fixed";
+      popup.style.left = (vv.offsetLeft + 8) + "px";
+      popup.style.top = (vv.offsetTop + toolbarH + 8) + "px";
+      popup.style.right = "auto";
+      popup.style.width = Math.max(280, vv.width - 16) + "px";
+      popup.style.maxWidth = Math.max(280, vv.width - 16) + "px";
+      popup.style.maxHeight = Math.max(120, vv.height - toolbarH - 24) + "px";
+      popup.style.transform = "translate(0,0)";
+    }
+  }
+
+  function bindSync() {
+    syncViewportUI();
+    window.addEventListener("resize", syncViewportUI, { passive: true });
+    window.addEventListener("orientationchange", syncViewportUI, { passive: true });
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener("resize", syncViewportUI, { passive: true });
+      window.visualViewport.addEventListener("scroll", syncViewportUI, { passive: true });
+    }
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", bindSync, { once: true });
+  } else {
+    bindSync();
+  }
+})();
+</script>
+
 </body>
 </html>
