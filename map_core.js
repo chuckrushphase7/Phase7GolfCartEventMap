@@ -642,14 +642,7 @@ if (typeof window.findGolfHoleAt === "function") {
   const hole = window.findGolfHoleAt(cx, cy);
   if (hole) {
     // Remember selected hole so draw_golf.js can highlight it
-if (hole) {
-  window.selectedHole = Number(hole.hole_number);
-  window.GOLF_SELECTED_HOLE_NUMBER = Number(hole.hole_number);
-  window.GOLF_SELECTED_HOLE = hole;
-
-  if (typeof window.centerMapOn === "function") {
-    window.centerMapOn(hole.flag_x, hole.flag_y);
-  }
+window.selectedHole = Number(hole.hole_number);
 
     // Center map on the hole if helper exists
     if (typeof window.centerMapOn === "function") {
