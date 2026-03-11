@@ -143,31 +143,66 @@ console.log("DRAW_GOLF VERSION STAMP: 2026-03-04 B");
       }
 
       // Hole select (adjust target hole)
-      let holeSel = document.getElementById("golfHoleSelect");
-      if (!holeSel) {
-        holeSel = document.createElement("select");
-        holeSel.id = "golfHoleSelect";
-        holeSel.style.fontSize = "0.82rem";
-        holeSel.style.padding = "3px 6px";
-        holeSel.style.borderRadius = "8px";
-        holeSel.style.border = "1px solid #9ca3af";
+holeSel.addEventListener("change", function () {
+  const hn = parseInt(holeSel.value, 10) || 1;
 
-        for (let i = 1; i <= 18; i++) {
-          const opt = document.createElement("option");
-          opt.value = String(i);
-          opt.textContent = "Hole " + i;
-          holeSel.appendChild(opt);
-        }
+  const ed = getEdit();
+  ed.hole_number = hn;
 
-        holeSel.addEventListener("change", function () {
-          const ed = getEdit();
-          ed.hole_number = parseInt(holeSel.value, 10) || 1;
-          if (typeof window.safeDrawLots === "function") window.safeDrawLots();
-          else if (typeof drawLots === "function") drawLots();
-        });
+  // Keep golf highlight in sync with dropdown choice
+  window.selectedHole = hn;
+  window.GOLF_SELECTED_HOLE_NUMBER = hn;
 
-        host.appendChild(holeSel);
+  // If golf hole data is available, center on that hole and update popup
+  const holes = Array.isArray(window.GOLF_HOLES) ? window.GOLF_HOLES : [];
+  const hole = holes.find(h => Number(h.hole_number) === hn);
+
+  if (hole) {
+    window.GOLF_SELECTED_HOLE = hole;
+
+    if (typeof window.centerMapOn === "function") {
+      const fx = Number(hole.flag_x);
+      const fy = Number(hole.flag_y);
+      if (Number.isFinite(fx) && Number.isFinite(fy)) {
+        window.centerMapOn(fx, fy);
       }
+    }
+
+    const popup = document.getElementById("holePopup");
+    const title = document.getElementById("holeTitle");
+    const text = document.getElementById("holeText");
+
+    if (popup && title && text) {
+      const courseName = window.GOLF_ACTIVE_COURSE || "Golf Course";
+      const holeName = hole.holename || ("Hole " + hole.hole_number);
+
+      title.textContent = courseName + " - " + holeName;
+
+      let line = "";
+      if (hole.par != null) line += "Par " + hole.par;
+      if (hole.handicap != null) {
+        if (line) line += " • ";
+        line += "Handicap " + hole.handicap;
+      }
+
+      text.textContent = line || "";
+      popup.classList.remove("hidden");
+      popup.style.display = "block";
+      popup.style.visibility = "visible";
+      popup.style.pointerEvents = "auto";
+    }
+  }
+
+  if (typeof window.safeDrawGolf === "function") {
+    window.safeDrawGolf();
+  }
+
+  if (typeof window.safeDrawLots === "function") {
+    window.safeDrawLots();
+  } else if (typeof drawLots === "function") {
+    drawLots();
+  }
+});
 
       // Target select
       let targetSel = document.getElementById("golfTargetSelect");
