@@ -466,44 +466,34 @@ window.findGolfHoleAt = function (x, y) {
 
 for (const h of holes) {
   const hn = Number(h.hole_number);
+  if (!Number.isFinite(hn)) continue;
 
-  const isSel = (selectedHole != null) ? (hn === selectedHole) : false;
+  const isSel = (window.selectedHole != null) ? (hn === Number(window.selectedHole)) : false;
 
+  // Tee
   const tx = Number(h.tee_x);
   const ty = Number(h.tee_y);
+  if (Number.isFinite(tx) && Number.isFinite(ty)) {
+    ctx.globalAlpha = (window.selectedHole != null && !isSel) ? 0.55 : 1;
+    drawHoleMarker(ctx, tx, ty, isSel);
+  }
 
-  drawHoleMarker(ctx, tx, ty, isSel);
-}
-    for (const h of holes) {
-      const hn = Number(h.hole_number);
-      if (!Number.isFinite(hn)) continue;
+  // Flag
+  const fx = Number(h.flag_x);
+  const fy = Number(h.flag_y);
+  if (Number.isFinite(fx) && Number.isFinite(fy)) {
+    ctx.globalAlpha = (window.selectedHole != null && !isSel) ? 0.55 : 1;
+    drawHoleMarker(ctx, fx, fy, isSel);
 
-      const isSel = (selectedHole != null) ? (hn === selectedHole) : false;
+    // Label near flag (dark, readable)
+    ctx.save();
 
-      // Tee
-      const tx = Number(h.tee_x);
-      const ty = Number(h.tee_y);
-      if (Number.isFinite(tx) && Number.isFinite(ty)) {
-        ctx.globalAlpha = (selectedHole && !isSel) ? 0.55 : 1;
-        drawHoleMarker(ctx, tx, ty, isSel);
-      }
+    let alpha = 1;
 
-      // Flag
-      const fx = Number(h.flag_x);
-      const fy = Number(h.flag_y);
-      if (Number.isFinite(fx) && Number.isFinite(fy)) {
-        ctx.globalAlpha = (selectedHole && !isSel) ? 0.55 : 1;
-        drawHoleMarker(ctx, fx, fy, isSel);
-
-        // Label near flag (dark, readable)
-        ctx.save();
-
-let alpha = 1;
-
-// Dim non-selected holes when one is selected
-if (selectedHole && !isSel) {
-  alpha = 0.55;
-}
+    // Dim non-selected holes when one is selected
+    if (window.selectedHole != null && !isSel) {
+      alpha = 0.55;
+    }
 
 // Make selected hole label pulse
 if (isSel) {
