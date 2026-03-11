@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"/>
 <meta name="mobile-web-app-capable" content="yes">
 <title>Phase 7 Golf Event</title>
 
@@ -78,14 +78,14 @@
       overscroll-behavior:contain;
       background:#111827;
       -webkit-overflow-scrolling:touch;
-      touch-action:auto;
+      touch-action:manipulation;
     }
 
     /* ✅ let canvas define its own layout size so overflow works */
     #mapCanvas{
       display:block;
       image-rendering:auto;
-      touch-action:auto;
+      touch-action:manipulation;
       transform-origin:top left;
       margin:0 auto;
     }
@@ -111,7 +111,7 @@
   overscroll-behavior: contain;
   -webkit-overflow-scrolling: touch;
   box-sizing: border-box;
-  z-index: 2147483647;
+  z-index: 1000000;
   pointer-events: auto;
   background: rgba(0, 0, 0, 0.92);
   color: #fff;
@@ -141,11 +141,7 @@
 }
 
 .hole-popup.hidden {
-  display: none !important;
-}
-
-.hole-popup:not(.hidden) {
-  display: block !important;
+  display: none;
 }
   </style>
 
