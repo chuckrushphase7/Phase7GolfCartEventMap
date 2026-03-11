@@ -222,95 +222,118 @@ toggle.addEventListener("change", function () {
     })();
   </script>
 <script>
-  (function initGolfUI(){
-    const courseSel = document.getElementById("courseSelect");
-    const holeSel   = document.getElementById("holeSelect");
-    if (!courseSel || !holeSel) return;
+(function initGolfUI() {
+  const courseSel = document.getElementById("courseSelect");
+  const holeSel = document.getElementById("holeSelect");
+  if (!courseSel || !holeSel) return;
 
-    const data =
-      window.GOLF_OVERLAY_DATA ||
-      window.golf_overlay_data ||
-      window.GOLF_DATA ||
-      null;
+  const data =
+    window.GOLF_OVERLAY_DATA ||
+    window.golf_overlay_data ||
+    window.GOLF_DATA ||
+    null;
 
-    if (!data) {
-      console.warn("Golf UI: no golf overlay data found on window.");
-      courseSel.innerHTML = "<option>Golf data missing</option>";
-      holeSel.innerHTML = "<option>-</option>";
-      return;
+  if (!data) {
+    console.warn("Golf UI: no golf overlay data found on window.");
+    courseSel.innerHTML = "<option>Golf data missing</option>";
+    holeSel.innerHTML = "<option>-</option>";
+    return;
+  }
+
+  const courses = Array.isArray(data.courses) ? data.courses : [];
+
+  courseSel.innerHTML = "";
+  holeSel.innerHTML = "";
+
+  function setActive() {
+    window.GOLF_ACTIVE_COURSE = courseSel.value || "";
+    window.GOLF_ACTIVE_HOLE = holeSel.value ? Number(holeSel.value) : null;
+
+    // IMPORTANT: this drives the highlight ring
+    window.selectedHole = holeSel.value ? Number(holeSel.value) : null;
+    window.GOLF_SELECTED_HOLE_NUMBER = window.selectedHole;
+
+    localStorage.setItem("GOLF_ACTIVE_COURSE", window.GOLF_ACTIVE_COURSE);
+    localStorage.setItem("GOLF_ACTIVE_HOLE", holeSel.value || "");
+
+    if (typeof window.safeDrawGolf === "function") {
+      window.safeDrawGolf();
     }
 
-    const courses = Array.isArray(data.courses) ? data.courses : [];
+    if (typeof window.safeDrawLots === "function") {
+      window.safeDrawLots();
+    } else if (typeof window.drawLots === "function") {
+      window.drawLots();
+    }
+  }
 
-    courseSel.innerHTML = "";
+  function rebuildHoles() {
+    const courseName = courseSel.value;
+    const course =
+      courses.find(c => c.course_name === courseName || c.name === courseName) ||
+      courses[0];
+
     holeSel.innerHTML = "";
 
-    function setActive() {
-      window.GOLF_ACTIVE_COURSE = courseSel.value || "";
-      window.GOLF_ACTIVE_HOLE = holeSel.value ? Number(holeSel.value) : null;
+    const holes = (course && Array.isArray(course.holes)) ? course.holes : [];
 
-      localStorage.setItem("GOLF_ACTIVE_COURSE", window.GOLF_ACTIVE_COURSE);
-      localStorage.setItem("GOLF_ACTIVE_HOLE", holeSel.value || "");
+    holeSel.insertAdjacentHTML("beforeend", '<option value="">All holes</option>');
 
-      if (typeof window.safeDrawLots === "function") window.safeDrawLots();
-      else if (typeof window.drawLots === "function") window.drawLots();
-    }
+    holes.forEach(h => {
+      const n = Number(h.hole_number);
+      if (!Number.isFinite(n)) return;
 
-    function rebuildHoles() {
-      const courseName = courseSel.value;
-      const course = courses.find(c => c.course_name === courseName || c.name === courseName) || courses[0];
-
-      holeSel.innerHTML = "";
-
-      const holes = (course && Array.isArray(course.holes)) ? course.holes : [];
-
-      holeSel.insertAdjacentHTML("beforeend", `<option value="">All holes</option>`);
-
-      holes.forEach(h => {
-        const n = Number(h.hole_number);
-        if (!Number.isFinite(n)) return;
-        holeSel.insertAdjacentHTML("beforeend", `<option value="${n}">Hole ${n}</option>`);
-      });
-
-      const savedHole = localStorage.getItem("GOLF_ACTIVE_HOLE");
-
-if ([...holeSel.options].some(o => o.value === "1")) {
-  holeSel.value = "1";
-} else {
-  holeSel.value = "";
-}
-
-      setActive();
-    }
-
-    courseSel.insertAdjacentHTML("beforeend", `<option value="">Select course</option>`);
-
-    courses.forEach(c => {
-      const name = c.course_name || c.name || "";
-      if (!name) return;
-      courseSel.insertAdjacentHTML("beforeend", `<option value="${name}">${name}</option>`);
+      holeSel.insertAdjacentHTML(
+        "beforeend",
+        `<option value="${n}">Hole ${n}</option>`
+      );
     });
 
-    const savedCourse = localStorage.getItem("GOLF_ACTIVE_COURSE");
+    const savedHole = localStorage.getItem("GOLF_ACTIVE_HOLE");
 
-    if (savedCourse && [...courseSel.options].some(o => o.value === savedCourse)) {
-      courseSel.value = savedCourse;
-    } else if (courses[0] && (courses[0].course_name || courses[0].name)) {
-      courseSel.value = courses[0].course_name || courses[0].name;
+    if (savedHole && [...holeSel.options].some(o => o.value === savedHole)) {
+      holeSel.value = savedHole;
+    } else if ([...holeSel.options].some(o => o.value === "1")) {
+      holeSel.value = "1";
     } else {
-      courseSel.value = "";
+      holeSel.value = "";
     }
 
+    setActive();
+  }
+
+  courseSel.insertAdjacentHTML("beforeend", '<option value="">Select course</option>');
+
+  courses.forEach(c => {
+    const name = c.course_name || c.name || "";
+    if (!name) return;
+
+    courseSel.insertAdjacentHTML(
+      "beforeend",
+      `<option value="${name}">${name}</option>`
+    );
+  });
+
+  const savedCourse = localStorage.getItem("GOLF_ACTIVE_COURSE");
+
+  if (savedCourse && [...courseSel.options].some(o => o.value === savedCourse)) {
+    courseSel.value = savedCourse;
+  } else if (courses[0] && (courses[0].course_name || courses[0].name)) {
+    courseSel.value = courses[0].course_name || courses[0].name;
+  } else {
+    courseSel.value = "";
+  }
+
+  rebuildHoles();
+
+  courseSel.addEventListener("change", function () {
     rebuildHoles();
+  });
 
-    courseSel.addEventListener("change", () => {
-      rebuildHoles();
-    });
-
-    holeSel.addEventListener("change", () => {
-      setActive();
-    });
-  })();
+  holeSel.addEventListener("change", function () {
+    setActive();
+  });
+})();
 </script>
   <div id="holePopup" class="hole-popup hidden">
   <div class="hole-popup-inner">
