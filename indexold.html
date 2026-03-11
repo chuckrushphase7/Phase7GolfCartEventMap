@@ -20,35 +20,12 @@
       height:100%;
       margin:0;
       font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
-      overflow:hidden;
-      background:#111827;
+      overflow:auto; /* ✅ allow scrollbars if needed */
     }
-    body{
-      min-height:100dvh;
-      min-height:-webkit-fill-available;
-    }
-    #app{
-      height:100%;
-      min-height:100dvh;
-      display:flex;
-      flex-direction:column;
-      overflow:hidden;
-    }
+    #app{height:100%;display:flex;flex-direction:column;}
     #toolbar{
-      flex:none;
-      position:sticky;
-      top:0;
-      z-index:2000;
-      padding:10px 12px;
-      border-bottom:1px solid #e5e7eb;
-      display:flex;
-      gap:10px;
-      align-items:center;
-      flex-wrap:wrap;
-      background:rgba(255,255,255,0.96);
-      backdrop-filter:blur(4px);
-      -webkit-backdrop-filter:blur(4px);
-      box-sizing:border-box;
+      padding:10px 12px;border-bottom:1px solid #e5e7eb;
+      display:flex;gap:10px;align-items:center;flex-wrap:wrap;background:#fff;
     }
   #titleRow{
   display:flex;
@@ -69,13 +46,11 @@
 
     /* ✅ map area scrolls when content is larger than viewport */
     #mapWrapper{
-      flex:1 1 auto;
+      flex:1;
       position:relative;
-      overflow:auto;
-      overscroll-behavior:contain;
+      overflow:auto;                 /* ✅ was hidden */
       background:#111827;
       -webkit-overflow-scrolling:touch;
-      min-height:0;
     }
 
     /* ✅ let canvas define its own layout size so overflow works */
@@ -100,39 +75,20 @@
   transform: translateX(-50%);
   bottom: max(12px, calc(env(safe-area-inset-bottom) + 8px));
   width: min(92vw, 420px);
-  max-width: 420px;
-  max-height: min(28vh, 220px);
+  max-height: 24vh;
   overflow-y: auto;
-  overscroll-behavior: contain;
-  -webkit-overflow-scrolling: touch;
   box-sizing: border-box;
   z-index: 1000000;
-  pointer-events: auto;
-  background: rgba(0, 0, 0, 0.92);
+
+  background: rgba(0, 0, 0, 0.9);
   color: #fff;
   border-radius: 12px;
   border: 1px solid rgba(255,255,255,0.2);
-  box-shadow: 0 6px 20px rgba(0,0,0,0.35);
-  -webkit-text-size-adjust: 100%;
-  text-size-adjust: 100%;
-  scrollbar-gutter: stable;
 }
 
 .hole-popup-inner {
   box-sizing: border-box;
   padding: 12px 14px;
-}
-
-.hole-popup h3 {
-  margin: 0 0 6px 0;
-  font-size: 16px;
-  line-height: 1.2;
-}
-
-#holeText {
-  font-size: 14px;
-  line-height: 1.35;
-  word-wrap: break-word;
 }
 
 .hole-popup.hidden {
