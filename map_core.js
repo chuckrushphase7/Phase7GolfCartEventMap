@@ -637,61 +637,135 @@ function handleCanvasTap(clientX, clientY, shiftLike = false) {
     }
   }
 
-// 1.5) Golf holes
-if (typeof window.findGolfHoleAt === "function") {
-  const hole = window.findGolfHoleAt(cx, cy);
-  if (hole) {
-    // Remember selected hole so draw_golf.js can highlight it
-window.selectedHole = Number(hole.hole_number);
+function handleMapTapAtCanvasPoint(cx, cy) {
+  // 1.5) Golf holes
+  if (typeof window.findGolfHoleAt === "function") {
+    const hole = window.findGolfHoleAt(cx, cy);
+    if (hole) {
+      // Remember selected hole so draw_golf.js can highlight it
+      window.selectedHole = Number(hole.hole_number);
 
-    // Center map on the hole if helper exists
-    if (typeof window.centerMapOn === "function") {
-      window.centerMapOn(hole.flag_x, hole.flag_y);
-    }
-
-    // Show popup
-    const popup = document.getElementById("holePopup");
-    const title = document.getElementById("holeTitle");
-    const text = document.getElementById("holeText");
-
-    if (popup && title && text) {
-      const courseName = window.GOLF_ACTIVE_COURSE || "Golf Course";
-      const holeName = hole.holename || ("Hole " + hole.hole_number);
-
-      title.textContent = courseName + " - " + holeName;
-
-      let line = "";
-      if (hole.par != null) {
-        line += "Par " + hole.par;
-      }
-      if (hole.handicap != null) {
-        if (line) line += " • ";
-        line += "Handicap " + hole.handicap;
+      // Center map on the hole if helper exists
+      if (typeof window.centerMapOn === "function") {
+        window.centerMapOn(hole.flag_x, hole.flag_y);
       }
 
-      text.textContent = line || "";
+      // Show popup
+      const popup = document.getElementById("holePopup");
+      const title = document.getElementById("holeTitle");
+      const text = document.getElementById("holeText");
 
-      popup.classList.remove("hidden");
-      popup.style.display = "block";
-      popup.style.visibility = "visible";
-      popup.style.pointerEvents = "auto";
+      if (popup && title && text) {
+        const courseName = window.GOLF_ACTIVE_COURSE || "Golf Course";
+        const holeName = hole.holename || ("Hole " + hole.hole_number);
+
+        title.textContent = courseName + " - " + holeName;
+
+        let line = "";
+        if (hole.par != null) {
+          line += "Par " + hole.par;
+        }
+        if (hole.handicap != null) {
+          if (line) line += " • ";
+          line += "Handicap " + hole.handicap;
+        }
+
+        text.textContent = line || "";
+
+        popup.classList.remove("hidden");
+        popup.style.display = "block";
+        popup.style.visibility = "visible";
+        popup.style.pointerEvents = "auto";
+      }
+
+      // Redraw after selection so highlight appears
+      if (typeof window.safeDrawGolf === "function") {
+        window.safeDrawGolf();
+      }
+
+      console.log(
+        "hole popup class after show",
+        popup ? popup.className : "(no popup)",
+        popup ? popup.style.display : "(no popup)"
+      );
+
+      return true;
     }
-
-    // Redraw after selection so highlight appears
-    if (typeof window.safeDrawGolf === "function") {
-      window.safeDrawGolf();
-    }
-
-    console.log(
-      "hole popup class after show",
-      popup ? popup.className : "(no popup)",
-      popup ? popup.style.display : "(no popup)"
-    );
-
-    return;
   }
-}
 
+  return false;
+}
+(function () {
+  const canvas = document.getElementById("mapCanvas");
+  if (!canvas) return;
+
+  let tapStartX = 0;
+  let tapStartY = 0;
+  let tapStartTime = 0;
+  let tapTracking = false;
+
+  function clientToCanvas(clientX, clientY) {
+    const rect = canvas.getBoundingClientRect();
+    return {
+      cx: ((clientX - rect.left) / rect.width) * canvas.width,
+      cy: ((clientY - rect.top) / rect.height) * canvas.height
+    };
+  }
+
+  canvas.addEventListener("touchstart", function (e) {
+    if (!e.touches || e.touches.length !== 1) {
+      tapTracking = false;
+      return;
+    }
+
+    const t = e.touches[0];
+    tapStartX = t.clientX;
+    tapStartY = t.clientY;
+    tapStartTime = Date.now();
+    tapTracking = true;
+  }, { passive: true });
+
+  canvas.addEventListener("touchmove", function (e) {
+    if (!tapTracking || !e.touches || e.touches.length !== 1) {
+      tapTracking = false;
+      return;
+    }
+
+    const t = e.touches[0];
+    const dx = t.clientX - tapStartX;
+    const dy = t.clientY - tapStartY;
+
+    // If finger moved too far, treat it as pan instead of tap
+    if (Math.hypot(dx, dy) > 12) {
+      tapTracking = false;
+    }
+  }, { passive: true });
+
+  canvas.addEventListener("touchend", function (e) {
+    if (!tapTracking) return;
+
+    const dt = Date.now() - tapStartTime;
+    if (dt > 350) {
+      tapTracking = false;
+      return;
+    }
+
+    const t = e.changedTouches && e.changedTouches[0];
+    if (!t) {
+      tapTracking = false;
+      return;
+    }
+
+    const pt = clientToCanvas(t.clientX, t.clientY);
+    handleMapTapAtCanvasPoint(pt.cx, pt.cy);
+
+    tapTracking = false;
+  }, { passive: true });
+
+  canvas.addEventListener("touchcancel", function () {
+    tapTracking = false;
+  }, { passive: true });
+})();
   // 2) Lots
   const lot = findLotAt(cx, cy);
   if (lot) {
