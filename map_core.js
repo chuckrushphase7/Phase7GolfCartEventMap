@@ -748,18 +748,26 @@ function setupCanvasEvents() {
   let touchTracking = false;
   let twoFinger = false;
 
-  target.addEventListener(
-    "click",
-    function (e) {
-      if (isCanvasClickSuppressed()) {
-        e.preventDefault();
-        e.stopPropagation();
-        return;
-      }
-      handleCanvasTap(e.clientX, e.clientY, !!e.shiftKey);
-    },
-    { passive: false }
-  );
+target.addEventListener(
+  "click",
+  function (e) {
+    console.log("TARGET CLICK HANDLER FIRED", {
+      suppressed: isCanvasClickSuppressed(),
+      x: e.clientX,
+      y: e.clientY,
+      target: e.target && e.target.id
+    });
+
+    if (isCanvasClickSuppressed()) {
+      e.preventDefault();
+      e.stopPropagation();
+      return;
+    }
+
+    handleCanvasTap(e.clientX, e.clientY, !!e.shiftKey);
+  },
+  { passive: false }
+);
 
   target.addEventListener(
     "touchstart",
