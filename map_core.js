@@ -615,6 +615,9 @@ function showHolePopup(hole) {
  // title.textContent = courseName + " - " + holeName;
 title.textContent = "TEST HOLE TITLE";
 text.textContent = "TEST HOLE BODY";
+console.log("holeTitle element:", title);
+console.log("holeText element:", text);
+console.log("hole popup content now:", popup.innerHTML);
   let line = "";
   if (hole.par != null) line += "Par " + hole.par;
   if (hole.handicap != null) {
