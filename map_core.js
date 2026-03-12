@@ -147,7 +147,13 @@ function suppressCanvasClicks(ms = 800) {
 }
 
 function isCanvasClickSuppressed() {
-  return Date.now() < suppressNextCanvasClickUntil;
+  const suppressed = Date.now() < suppressNextCanvasClickUntil;
+  console.log("isCanvasClickSuppressed", {
+    now: Date.now(),
+    until: suppressNextCanvasClickUntil,
+    suppressed
+  });
+  return suppressed;
 }
 
 // -----------------------------------
