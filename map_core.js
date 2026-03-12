@@ -687,7 +687,7 @@ function handleMapTapAtCanvasPoint(cx, cy, clientX = null, clientY = null) {
 
 function handleCanvasTap(clientX, clientY, shiftLike = false) {
   
-  if (isCanvasClickSuppressed()) return;
+
 
   const pt = getCanvasXYFromClient(clientX, clientY);
   const cx = pt.x;
