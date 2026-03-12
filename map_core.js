@@ -627,6 +627,7 @@ function showHolePopup(hole) {
 window.showHolePopup = showHolePopup;
 
 function handleMapTapAtCanvasPoint(cx, cy, clientX = null, clientY = null) {
+  console.log("handleMapTapAtCanvasPoint entered", cx, cy);
   if (typeof window.findGolfHoleAt === "function") {
     const hole = window.findGolfHoleAt(cx, cy);
     if (hole) {
@@ -679,6 +680,7 @@ function handleMapTapAtCanvasPoint(cx, cy, clientX = null, clientY = null) {
 }
 
 function handleCanvasTap(clientX, clientY, shiftLike = false) {
+  
   if (isCanvasClickSuppressed()) return;
 
   const pt = getCanvasXYFromClient(clientX, clientY);
@@ -732,7 +734,7 @@ function handleCanvasTap(clientX, clientY, shiftLike = false) {
     digitizeNextHole++;
     return;
   }
-
+console.log("Calling handleMapTapAtCanvasPoint", cx, cy);
   handleMapTapAtCanvasPoint(cx, cy, clientX, clientY);
 }
 
