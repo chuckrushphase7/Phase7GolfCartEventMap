@@ -1,5 +1,6 @@
 // map_core.js
 // Core Phase 7 app logic: state, popups, map init, APK button.
+//Fix Mobile Click
 "use strict";
 
 console.log("MAP_CORE LOADED MARKER v3", new Date().toISOString());
@@ -142,7 +143,7 @@ let digitizeCurrentPath = null;
 // -----------------------------------
 let suppressNextCanvasClickUntil = 0;
 
-function suppressCanvasClicks(ms = 800) {
+function suppressCanvasClicks(ms = 350) {
   suppressNextCanvasClickUntil = Date.now() + ms;
 }
 
@@ -569,13 +570,11 @@ function hideHolePopup() {
   popup.style.visibility = "hidden";
   popup.style.pointerEvents = "none";
 }
-window.hideHolePopup = hideHolePopup;
 
 function showHolePopup(hole) {
   const popup = document.getElementById("holePopup");
   const title = document.getElementById("holeTitle");
   const text = document.getElementById("holeText");
-
   if (!popup || !title || !text) {
     console.warn("showHolePopup(): missing hole popup elements");
     return;
@@ -583,7 +582,6 @@ function showHolePopup(hole) {
 
   const courseName = window.GOLF_ACTIVE_COURSE || "Golf Course";
   const holeName = hole.holename || ("Hole " + hole.hole_number);
-
   title.textContent = courseName + " - " + holeName;
 
   let line = "";
@@ -592,7 +590,6 @@ function showHolePopup(hole) {
     if (line) line += " • ";
     line += "Handicap " + hole.handicap;
   }
-
   text.textContent = line || "";
 
   popup.classList.remove("hidden");
@@ -600,9 +597,8 @@ function showHolePopup(hole) {
   popup.style.visibility = "visible";
   popup.style.pointerEvents = "auto";
 
-  console.log("showHolePopup(): visible", "class=", popup.className, "display=", popup.style.display);
+  console.log("showHolePopup(): visible", popup.className, popup.style.display);
 }
-window.showHolePopup = showHolePopup;
 
 function handleMapTapAtCanvasPoint(cx, cy, clientX = null, clientY = null) {
   if (typeof window.findGolfHoleAt === "function") {
@@ -610,14 +606,21 @@ function handleMapTapAtCanvasPoint(cx, cy, clientX = null, clientY = null) {
     if (hole) {
       window.selectedHole = Number(hole.hole_number);
       hidePopup();
+
       if (typeof window.centerMapOn === "function") {
         window.centerMapOn(hole.flag_x, hole.flag_y);
       }
+
       showHolePopup(hole);
+
       if (typeof window.safeDrawGolf === "function") {
         window.safeDrawGolf();
       }
-      console.log("GOLF HIT RESULT:", { hole: hole.hole_number, hole_name: hole.holename });
+
+      console.log("GOLF HIT RESULT:", {
+        hole: hole.hole_number,
+        hole_name: hole.holename,
+      });
       return true;
     }
   }
@@ -727,14 +730,9 @@ function setupCanvasEvents() {
   target.addEventListener(
     "click",
     function (e) {
-      if (isCanvasClickSuppressed()) {
-        e.preventDefault();
-        e.stopPropagation();
-        return;
-      }
       handleCanvasTap(e.clientX, e.clientY, !!e.shiftKey);
     },
-    { passive: false }
+    { passive: true }
   );
 
   target.addEventListener(
@@ -766,7 +764,6 @@ function setupCanvasEvents() {
       const t = e.touches[0];
       const dx = t.clientX - touchStartX;
       const dy = t.clientY - touchStartY;
-
       if (Math.hypot(dx, dy) > 12) {
         touchTracking = false;
       }
@@ -796,7 +793,6 @@ function setupCanvasEvents() {
       }
 
       const t = e.changedTouches[0];
-      suppressCanvasClicks(800);
       handleCanvasTap(t.clientX, t.clientY, twoFinger);
 
       touchTracking = false;
