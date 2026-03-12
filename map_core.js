@@ -764,11 +764,13 @@ target.addEventListener(
       target: e.target && e.target.id
     });
 
-    if (isCanvasClickSuppressed()) {
-      e.preventDefault();
-      e.stopPropagation();
-      return;
-    }
+const isTouchDevice = ("ontouchstart" in window) || navigator.maxTouchPoints > 0;
+
+if (isTouchDevice && isCanvasClickSuppressed()) {
+  e.preventDefault();
+  e.stopPropagation();
+  return;
+}
 
     handleCanvasTap(e.clientX, e.clientY, !!e.shiftKey);
   },
