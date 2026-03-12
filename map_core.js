@@ -601,38 +601,42 @@ window.hideHolePopup = hideHolePopup;
 
 function showHolePopup(hole) {
   const popup = document.getElementById("holePopup");
-  const title = document.getElementById("holeTitle");
-  const text = document.getElementById("holeText");
-
-  if (!popup || !title || !text) {
-    console.warn("showHolePopup(): missing hole popup elements");
+  if (!popup) {
+    console.warn("showHolePopup(): missing holePopup");
     return;
   }
 
+  const holeNumber = hole?.hole_number ?? "";
+  const holeName = hole?.holename || hole?.hole_name || ("Hole " + holeNumber);
   const courseName = window.GOLF_ACTIVE_COURSE || "Golf Course";
-  const holeName = hole.holename || ("Hole " + hole.hole_number);
 
- // title.textContent = courseName + " - " + holeName;
-title.textContent = "TEST HOLE TITLE";
-text.textContent = "TEST HOLE BODY";
-console.log("holeTitle element:", title);
-console.log("holeText element:", text);
-console.log("hole popup content now:", popup.innerHTML);
   let line = "";
-  if (hole.par != null) line += "Par " + hole.par;
-  if (hole.handicap != null) {
+  if (hole?.par != null) line += "Par " + hole.par;
+  if (hole?.handicap != null) {
     if (line) line += " • ";
     line += "Handicap " + hole.handicap;
   }
+  if (!line && holeNumber) line = "Hole " + holeNumber;
 
-  // text.textContent = line || "";
+  popup.innerHTML = `
+    <div class="hole-popup-inner">
+      <h3 id="holeTitle">${courseName} - ${holeName}</h3>
+      <div id="holeText">${line}</div>
+    </div>
+  `;
 
   popup.classList.remove("hidden");
   popup.style.display = "block";
   popup.style.visibility = "visible";
   popup.style.pointerEvents = "auto";
 
-  console.log("showHolePopup(): visible", "class=", popup.className, "display=", popup.style.display);
+  console.log("showHolePopup rebuilt:", {
+    courseName,
+    holeName,
+    line
+  });
+
+  console.trace("showHolePopup trace");
 }
 window.showHolePopup = showHolePopup;
 
