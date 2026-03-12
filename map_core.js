@@ -671,14 +671,14 @@ function handleMapTapAtCanvasPoint(cx, cy, clientX = null, clientY = null) {
     }
   }
 
-  if (clientX != null && clientY != null) {
-    const lot = findLotAt(cx, cy);
-    if (lot) {
-      hideHolePopup();
-      showpopup(lot, clientX, clientY);
-      return true;
-    }
+if (clientX != null && clientY != null) {
+  const lot = findLotAt(Math.round(cx), Math.round(cy));
+  if (lot) {
+    hideHolePopup();
+    showpopup(lot, clientX, clientY);
+    return true;
   }
+}
 
   hidePopup();
   hideHolePopup();
