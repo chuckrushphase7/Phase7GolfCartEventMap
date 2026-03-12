@@ -766,11 +766,7 @@ target.addEventListener(
 
 const isTouchDevice = ("ontouchstart" in window) || navigator.maxTouchPoints > 0;
 
-if (isTouchDevice && isCanvasClickSuppressed()) {
-  e.preventDefault();
-  e.stopPropagation();
-  return;
-}
+
 
     handleCanvasTap(e.clientX, e.clientY, !!e.shiftKey);
   },
