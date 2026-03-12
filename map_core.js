@@ -751,10 +751,16 @@ function handleCanvasTap(clientX, clientY, shiftLike = false) {
 console.log("Calling handleMapTapAtCanvasPoint", cx, cy);
   handleMapTapAtCanvasPoint(cx, cy, clientX, clientY);
 }
-
+console.trace("CALLING setupCanvasEvents");
 function setupCanvasEvents() {
   const target = document.getElementById("mapWrapper") || canvas;
   if (!target) return;
+
+  if (target.dataset.eventsBound === "1") {
+    console.log("setupCanvasEvents: already bound, skipping");
+    return;
+  }
+  target.dataset.eventsBound = "1";
 
   let touchStartX = 0;
   let touchStartY = 0;
@@ -762,24 +768,26 @@ function setupCanvasEvents() {
   let touchTracking = false;
   let twoFinger = false;
 
-target.addEventListener(
-  "click",
-  function (e) {
-    console.log("TARGET CLICK HANDLER FIRED", {
-      suppressed: isCanvasClickSuppressed(),
-      x: e.clientX,
-      y: e.clientY,
-      target: e.target && e.target.id
-    });
+  target.addEventListener(
+    "click",
+    function (e) {
+      console.log("TARGET CLICK HANDLER FIRED", {
+        suppressed: isCanvasClickSuppressed(),
+        x: e.clientX,
+        y: e.clientY,
+        target: e.target && e.target.id
+      });
 
-const isTouchDevice = ("ontouchstart" in window) || navigator.maxTouchPoints > 0;
+      if (isCanvasClickSuppressed()) {
+        e.preventDefault();
+        e.stopPropagation();
+        return;
+      }
 
-
-
-    handleCanvasTap(e.clientX, e.clientY, !!e.shiftKey);
-  },
-  { passive: false }
-);
+      handleCanvasTap(e.clientX, e.clientY, !!e.shiftKey);
+    },
+    { passive: false }
+  );
 
   target.addEventListener(
     "touchstart",
