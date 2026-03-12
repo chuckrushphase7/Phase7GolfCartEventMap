@@ -606,22 +606,24 @@ function showHolePopup(hole) {
     return;
   }
 
-  const holeNumber = hole?.hole_number ?? "";
-  const holeName = hole?.holename || hole?.hole_name || ("Hole " + holeNumber);
   const courseName = window.GOLF_ACTIVE_COURSE || "Golf Course";
+  const holeNumber = hole?.hole_number ?? "";
+  const holeDisplay = holeNumber ? "Hole " + holeNumber : "Hole";
 
-  let line = "";
-  if (hole?.par != null) line += "Par " + hole.par;
-  if (hole?.handicap != null) {
-    if (line) line += " • ";
-    line += "Handicap " + hole.handicap;
-  }
-  if (!line && holeNumber) line = "Hole " + holeNumber;
+  const actualHoleName =
+    hole?.holename ||
+    hole?.hole_name ||
+    hole?.name ||
+    holeDisplay;
+
+  const parText = hole?.par != null ? "Par " + hole.par : "Par ?";
+  const handicapText = hole?.handicap != null ? "Handicap " + hole.handicap : "Handicap ?";
 
   popup.innerHTML = `
     <div class="hole-popup-inner">
-      <h3 id="holeTitle">${courseName} - ${holeName}</h3>
-      <div id="holeText">${line}</div>
+      <div class="hole-line hole-line-1">${courseName} -- ${holeDisplay}</div>
+      <div class="hole-line hole-line-2">${actualHoleName}</div>
+      <div class="hole-line hole-line-3">${parText}&nbsp;&nbsp;&nbsp;&nbsp;${handicapText}</div>
     </div>
   `;
 
@@ -629,15 +631,8 @@ function showHolePopup(hole) {
   popup.style.display = "block";
   popup.style.visibility = "visible";
   popup.style.pointerEvents = "auto";
-
-  console.log("showHolePopup rebuilt:", {
-    courseName,
-    holeName,
-    line
-  });
-
-  console.trace("showHolePopup trace");
 }
+
 window.showHolePopup = showHolePopup;
 
 function handleMapTapAtCanvasPoint(cx, cy, clientX = null, clientY = null) {
@@ -680,11 +675,13 @@ function handleMapTapAtCanvasPoint(cx, cy, clientX = null, clientY = null) {
   }
 
 if (clientX != null && clientY != null) {
-  const lot = findLotAt(Math.round(cx), Math.round(cy));
-  if (lot) {
-    hideHolePopup();
-    showpopup(lot, clientX, clientY);
-    return true;
+  if (window.RESIDENT_MODE) {
+    const lot = findLotAt(Math.round(cx), Math.round(cy));
+    if (lot) {
+      hideHolePopup();
+      showpopup(lot, clientX, clientY);
+      return true;
+    }
   }
 }
 
