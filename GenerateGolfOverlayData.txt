@@ -1,0 +1,1 @@
+SELECT 'window.golf_overlay_data = ' || jsonb_pretty(public.get_golf_overlay_data()) || ';' AS js_text;
