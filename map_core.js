@@ -785,7 +785,7 @@ function setupCanvasEvents() {
       const dx = t.clientX - touchStartX;
       const dy = t.clientY - touchStartY;
 
-      if (Math.hypot(dx, dy) > 12) {
+      if (Math.hypot(dx, dy) > 24) {
         touchTracking = false;
       }
     },
