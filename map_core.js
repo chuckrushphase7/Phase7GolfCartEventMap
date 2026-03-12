@@ -521,6 +521,10 @@ function showEventPopup(ev, clientX, clientY) {
   if (!popup || !canvas || !mapWrapper) return;
 
   popup.innerHTML = buildEventPopupContent(ev);
+  
+  console.log("showEventPopup fired", ev);
+console.log("popup HTML:", popup.innerHTML);
+
   popup.classList.remove("hidden");
   popup.setAttribute("aria-hidden", "false");
   popup.style.display = "block";
