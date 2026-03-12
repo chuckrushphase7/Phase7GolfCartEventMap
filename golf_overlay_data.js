@@ -1,4 +1,4 @@
-window.golf_overlay_data = {
+
     "courses": [
         {
             "holes": [
