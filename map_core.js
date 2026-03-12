@@ -616,8 +616,8 @@ function showHolePopup(hole) {
     hole?.name ||
     holeDisplay;
 
-  const parText = hole?.par != null ? "Par " + hole.par : "Par ?";
-  const handicapText = hole?.handicap != null ? "Handicap " + hole.handicap : "Handicap ?";
+  const parText = "Par " + (hole?.par ?? "?");
+  const handicapText = "Handicap " + (hole?.handicap ?? 0);
 
   popup.innerHTML = `
     <div class="hole-popup-inner">
