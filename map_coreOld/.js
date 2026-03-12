@@ -560,104 +560,6 @@ function showEventPopup(ev, clientX, clientY) {
   popup.style.top = top + "px";
 }
 
-function hideHolePopup() {
-  const popup = document.getElementById("holePopup");
-  if (!popup) return;
-
-  popup.classList.add("hidden");
-  popup.style.display = "none";
-  popup.style.visibility = "hidden";
-  popup.style.pointerEvents = "none";
-}
-
-function showHolePopup(hole) {
-  const popup = document.getElementById("holePopup");
-  const title = document.getElementById("holeTitle");
-  const text = document.getElementById("holeText");
-  if (!popup || !title || !text) {
-    console.warn("showHolePopup(): missing hole popup elements");
-    return;
-  }
-
-  const courseName = window.GOLF_ACTIVE_COURSE || "Golf Course";
-  const holeName = hole.holename || ("Hole " + hole.hole_number);
-  title.textContent = courseName + " - " + holeName;
-
-  let line = "";
-  if (hole.par != null) line += "Par " + hole.par;
-  if (hole.handicap != null) {
-    if (line) line += " • ";
-    line += "Handicap " + hole.handicap;
-  }
-  text.textContent = line || "";
-
-  popup.classList.remove("hidden");
-  popup.style.display = "block";
-  popup.style.visibility = "visible";
-  popup.style.pointerEvents = "auto";
-
-  console.log("showHolePopup(): visible", popup.className, popup.style.display);
-}
-
-function handleMapTapAtCanvasPoint(cx, cy, clientX = null, clientY = null) {
-  if (typeof window.findGolfHoleAt === "function") {
-    const hole = window.findGolfHoleAt(cx, cy);
-    if (hole) {
-      window.selectedHole = Number(hole.hole_number);
-      hidePopup();
-
-      if (typeof window.centerMapOn === "function") {
-        window.centerMapOn(hole.flag_x, hole.flag_y);
-      }
-
-      showHolePopup(hole);
-
-      if (typeof window.safeDrawGolf === "function") {
-        window.safeDrawGolf();
-      }
-
-      console.log("GOLF HIT RESULT:", {
-        hole: hole.hole_number,
-        hole_name: hole.holename,
-      });
-      return true;
-    }
-  }
-
-  if (window.ENABLE_EVENTS && clientX != null && clientY != null) {
-    const ev = findEventAt(cx, cy);
-    if (ev) {
-      hideHolePopup();
-      showEventPopup(ev, clientX, clientY);
-      return true;
-    }
-
-    const site = findMappedSiteAt(cx, cy);
-    if (site) {
-      const siteId = site.siteId || site.id || site.name;
-      const siteEvent = findEventForSite(siteId);
-      if (siteEvent) {
-        hideHolePopup();
-        showEventPopup(siteEvent, clientX, clientY);
-        return true;
-      }
-    }
-  }
-
-  if (clientX != null && clientY != null) {
-    const lot = findLotAt(cx, cy);
-    if (lot) {
-      hideHolePopup();
-      showpopup(lot, clientX, clientY);
-      return true;
-    }
-  }
-
-  hidePopup();
-  hideHolePopup();
-  return false;
-}
-
 function handleCanvasTap(clientX, clientY, shiftLike = false) {
   if (isCanvasClickSuppressed()) return;
 
@@ -665,6 +567,7 @@ function handleCanvasTap(clientX, clientY, shiftLike = false) {
   const cx = pt.x;
   const cy = pt.y;
 
+  // Golf adjust mode
   try {
     if (window.GOLF_EDIT && window.GOLF_EDIT.enabled && window.GOLF_OVERLAY_DATA) {
       const courseName = window.GOLF_ACTIVE_COURSE;
@@ -693,6 +596,7 @@ function handleCanvasTap(clientX, clientY, shiftLike = false) {
     console.warn("Golf adjust failed:", e);
   }
 
+  // Digitizer
   if (DIGITIZE_MODE) {
     if (shiftLike) {
       digitizeBoundary.push({ x: cx, y: cy });
@@ -713,18 +617,170 @@ function handleCanvasTap(clientX, clientY, shiftLike = false) {
     return;
   }
 
-  handleMapTapAtCanvasPoint(cx, cy, clientX, clientY);
+  // 1) Events
+  if (window.ENABLE_EVENTS) {
+    const ev = findEventAt(cx, cy);
+    if (ev) {
+      showEventPopup(ev, clientX, clientY);
+      return;
+    }
+
+    // Fallback: mapped site tap -> site event
+    const site = findMappedSiteAt(cx, cy);
+    if (site) {
+      const siteId = site.siteId || site.id || site.name;
+      const siteEvent = findEventForSite(siteId);
+      if (siteEvent) {
+        showEventPopup(siteEvent, clientX, clientY);
+        return;
+      }
+    }
+  }
+
+function handleMapTapAtCanvasPoint(cx, cy) {
+  // 1.5) Golf holes
+  if (typeof window.findGolfHoleAt === "function") {
+    const hole = window.findGolfHoleAt(cx, cy);
+    if (hole) {
+      // Remember selected hole so draw_golf.js can highlight it
+      window.selectedHole = Number(hole.hole_number);
+
+      // Center map on the hole if helper exists
+      if (typeof window.centerMapOn === "function") {
+        window.centerMapOn(hole.flag_x, hole.flag_y);
+      }
+
+      // Show popup
+      const popup = document.getElementById("holePopup");
+      const title = document.getElementById("holeTitle");
+      const text = document.getElementById("holeText");
+
+      if (popup && title && text) {
+        const courseName = window.GOLF_ACTIVE_COURSE || "Golf Course";
+        const holeName = hole.holename || ("Hole " + hole.hole_number);
+
+        title.textContent = courseName + " - " + holeName;
+
+        let line = "";
+        if (hole.par != null) {
+          line += "Par " + hole.par;
+        }
+        if (hole.handicap != null) {
+          if (line) line += " • ";
+          line += "Handicap " + hole.handicap;
+        }
+
+        text.textContent = line || "";
+
+        popup.classList.remove("hidden");
+        popup.style.display = "block";
+        popup.style.visibility = "visible";
+        popup.style.pointerEvents = "auto";
+      }
+
+      // Redraw after selection so highlight appears
+      if (typeof window.safeDrawGolf === "function") {
+        window.safeDrawGolf();
+      }
+
+      console.log(
+        "hole popup class after show",
+        popup ? popup.className : "(no popup)",
+        popup ? popup.style.display : "(no popup)"
+      );
+
+      return true;
+    }
+  }
+
+  return false;
+}
+(function () {
+  const canvas = document.getElementById("mapCanvas");
+  if (!canvas) return;
+
+  let tapStartX = 0;
+  let tapStartY = 0;
+  let tapStartTime = 0;
+  let tapTracking = false;
+
+  function clientToCanvas(clientX, clientY) {
+    const rect = canvas.getBoundingClientRect();
+    return {
+      cx: ((clientX - rect.left) / rect.width) * canvas.width,
+      cy: ((clientY - rect.top) / rect.height) * canvas.height
+    };
+  }
+
+  canvas.addEventListener("touchstart", function (e) {
+    if (!e.touches || e.touches.length !== 1) {
+      tapTracking = false;
+      return;
+    }
+
+    const t = e.touches[0];
+    tapStartX = t.clientX;
+    tapStartY = t.clientY;
+    tapStartTime = Date.now();
+    tapTracking = true;
+  }, { passive: true });
+
+  canvas.addEventListener("touchmove", function (e) {
+    if (!tapTracking || !e.touches || e.touches.length !== 1) {
+      tapTracking = false;
+      return;
+    }
+
+    const t = e.touches[0];
+    const dx = t.clientX - tapStartX;
+    const dy = t.clientY - tapStartY;
+
+    // If finger moved too far, treat it as pan instead of tap
+    if (Math.hypot(dx, dy) > 12) {
+      tapTracking = false;
+    }
+  }, { passive: true });
+
+  canvas.addEventListener("touchend", function (e) {
+    if (!tapTracking) return;
+
+    const dt = Date.now() - tapStartTime;
+    if (dt > 350) {
+      tapTracking = false;
+      return;
+    }
+
+    const t = e.changedTouches && e.changedTouches[0];
+    if (!t) {
+      tapTracking = false;
+      return;
+    }
+
+    const pt = clientToCanvas(t.clientX, t.clientY);
+    handleMapTapAtCanvasPoint(pt.cx, pt.cy);
+
+    tapTracking = false;
+  }, { passive: true });
+
+  canvas.addEventListener("touchcancel", function () {
+    tapTracking = false;
+  }, { passive: true });
+})();
+  // 2) Lots
+  const lot = findLotAt(cx, cy);
+  if (lot) {
+    showpopup(lot, clientX, clientY);
+  } else {
+    hidePopup();
+
+    const popup = document.getElementById("holePopup");
+    if (popup) popup.classList.add("hidden");
+  }
 }
 
 function setupCanvasEvents() {
   const target = document.getElementById("mapWrapper") || canvas;
   if (!target) return;
-
-  let touchStartX = 0;
-  let touchStartY = 0;
-  let touchStartTime = 0;
-  let touchTracking = false;
-  let twoFinger = false;
 
   target.addEventListener(
     "click",
@@ -734,38 +790,12 @@ function setupCanvasEvents() {
     { passive: true }
   );
 
+  let twoFinger = false;
+
   target.addEventListener(
     "touchstart",
     function (e) {
-      twoFinger = !!(e.touches && e.touches.length >= 2);
-
-      if (e.touches && e.touches.length === 1) {
-        const t = e.touches[0];
-        touchStartX = t.clientX;
-        touchStartY = t.clientY;
-        touchStartTime = Date.now();
-        touchTracking = true;
-      } else {
-        touchTracking = false;
-      }
-    },
-    { passive: true }
-  );
-
-  target.addEventListener(
-    "touchmove",
-    function (e) {
-      if (!touchTracking || !e.touches || e.touches.length !== 1) {
-        touchTracking = false;
-        return;
-      }
-
-      const t = e.touches[0];
-      const dx = t.clientX - touchStartX;
-      const dy = t.clientY - touchStartY;
-      if (Math.hypot(dx, dy) > 12) {
-        touchTracking = false;
-      }
+      twoFinger = e.touches && e.touches.length >= 2;
     },
     { passive: true }
   );
@@ -773,38 +803,11 @@ function setupCanvasEvents() {
   target.addEventListener(
     "touchend",
     function (e) {
-      if (!touchTracking) {
+      if (e.changedTouches && e.changedTouches.length > 0) {
+        const t = e.changedTouches[0];
+        handleCanvasTap(t.clientX, t.clientY, twoFinger);
         twoFinger = false;
-        return;
       }
-
-      const dt = Date.now() - touchStartTime;
-      if (dt > 350) {
-        touchTracking = false;
-        twoFinger = false;
-        return;
-      }
-
-      if (!e.changedTouches || !e.changedTouches.length) {
-        touchTracking = false;
-        twoFinger = false;
-        return;
-      }
-
-      const t = e.changedTouches[0];
-      handleCanvasTap(t.clientX, t.clientY, twoFinger);
-
-      touchTracking = false;
-      twoFinger = false;
-    },
-    { passive: true }
-  );
-
-  target.addEventListener(
-    "touchcancel",
-    function () {
-      touchTracking = false;
-      twoFinger = false;
     },
     { passive: true }
   );
