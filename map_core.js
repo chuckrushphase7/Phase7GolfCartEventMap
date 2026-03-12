@@ -520,9 +520,6 @@ function showEventPopup(ev, clientX, clientY) {
   const popup = document.getElementById("popup");
   if (!popup || !canvas || !mapWrapper) return;
 
-  const wrapperRect = mapWrapper.getBoundingClientRect();
-  const canvasRect = canvas.getBoundingClientRect();
-
   popup.innerHTML = buildEventPopupContent(ev);
   popup.classList.remove("hidden");
   popup.setAttribute("aria-hidden", "false");
@@ -530,8 +527,33 @@ function showEventPopup(ev, clientX, clientY) {
   popup.style.visibility = "visible";
   popup.style.pointerEvents = "auto";
   enforcePopupTopLayer();
-
   wirePopupInterceptionAndClose(popup);
+
+// Mobile: show popup as fixed overlay
+if (window.innerWidth <= 768) {
+  popup.style.position = "fixed";
+  popup.style.left = "8px";
+  popup.style.right = "8px";
+  popup.style.top = "120px";
+  popup.style.width = "auto";
+  popup.style.maxWidth = "none";
+  popup.style.maxHeight = "34vh";
+  popup.style.overflow = "auto";
+  popup.style.zIndex = "20000";
+  return;
+}
+
+const popupRect = popup.getBoundingClientRect();
+
+  // Desktop: keep existing map-relative placement
+  popup.style.position = "absolute";
+  popup.style.right = "";
+  popup.style.width = "";
+  popup.style.maxHeight = "";
+  popup.style.overflow = "";
+
+  const wrapperRect = mapWrapper.getBoundingClientRect();
+  const canvasRect = canvas.getBoundingClientRect();
 
   const offsetX = canvasRect.left - wrapperRect.left;
   const offsetY = canvasRect.top - wrapperRect.top;
@@ -543,10 +565,6 @@ function showEventPopup(ev, clientX, clientY) {
   popup.style.top = top + "px";
 
   const popupRect = popup.getBoundingClientRect();
-
-  if (window.innerWidth <= 768) {
-    left = (wrapperRect.width - popupRect.width) / 2;
-  }
 
   const maxLeft = wrapperRect.width - popupRect.width - 8;
   const maxTop = wrapperRect.height - popupRect.height - 8;
