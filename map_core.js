@@ -564,7 +564,7 @@ const popupRect = popup.getBoundingClientRect();
   popup.style.left = left + "px";
   popup.style.top = top + "px";
 
-  const popupRect = popup.getBoundingClientRect();
+
 
   const maxLeft = wrapperRect.width - popupRect.width - 8;
   const maxTop = wrapperRect.height - popupRect.height - 8;
