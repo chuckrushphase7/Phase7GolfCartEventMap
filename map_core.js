@@ -612,8 +612,9 @@ function showHolePopup(hole) {
   const courseName = window.GOLF_ACTIVE_COURSE || "Golf Course";
   const holeName = hole.holename || ("Hole " + hole.hole_number);
 
-  title.textContent = courseName + " - " + holeName;
-
+ // title.textContent = courseName + " - " + holeName;
+title.textContent = "TEST HOLE TITLE";
+text.textContent = "TEST HOLE BODY";
   let line = "";
   if (hole.par != null) line += "Par " + hole.par;
   if (hole.handicap != null) {
@@ -621,7 +622,7 @@ function showHolePopup(hole) {
     line += "Handicap " + hole.handicap;
   }
 
-  text.textContent = line || "";
+  // text.textContent = line || "";
 
   popup.classList.remove("hidden");
   popup.style.display = "block";
