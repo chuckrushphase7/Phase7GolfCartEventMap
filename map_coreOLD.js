@@ -1,6 +1,5 @@
 // map_core.js
 // Core Phase 7 app logic: state, popups, map init, APK button.
-//Fix Mobile Click
 "use strict";
 
 console.log("MAP_CORE LOADED MARKER v3", new Date().toISOString());
