@@ -662,7 +662,6 @@ if (hole) {
       console.log("GOLF HOLE HIT RESULT:", { hole: hole.hole_number, hole_name: hole.holename });
       return true;
     }
-  }
 
   if (window.ENABLE_EVENTS && clientX != null && clientY != null) {
     const ev = findEventAt(cx, cy);
