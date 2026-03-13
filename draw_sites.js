@@ -221,6 +221,9 @@ function drawPolygon(ctx, points, type) {
 function drawSite(ctx, site) {
   if (!site || !site.polygon) return;
 
+  // Do NOT draw ponds (still keep them for hit detection)
+  if (site.type === "pond") return;
+
   if (isBlueGuitarPark(site)) {
     drawBlueGuitarPark(ctx, site.polygon);
   } else {

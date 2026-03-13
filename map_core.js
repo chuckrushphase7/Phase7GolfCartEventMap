@@ -1,7 +1,9 @@
 // map_core.js
 // Core Phase 7 app logic: state, popups, map init, APK button.
 "use strict";
-
+console.log("========== LMHH MAP BUILD ==========");
+console.log("Build loaded:", new Date().toLocaleString());
+console.log("====================================");
 console.log("MAP_CORE LOADED MARKER v3", new Date().toISOString());
 const RESIDENT_PASSWORD = "parrotHead";
 // Default events ON unless explicitly set to false somewhere else BEFORE this file loads
@@ -640,7 +642,7 @@ function handleMapTapAtCanvasPoint(cx, cy, clientX = null, clientY = null) {
   if (typeof window.findGolfHoleAt === "function") {
     const hole = window.findGolfHoleAt(cx, cy);
     if (hole) {
-      window.selectedHole = Number(hole.hole_number);
+	window.GOLF_SELECTED_HOLE = Number(hole.hole_number);
       hidePopup();
       if (typeof window.centerMapOn === "function") {
         window.centerMapOn(hole.flag_x, hole.flag_y);
