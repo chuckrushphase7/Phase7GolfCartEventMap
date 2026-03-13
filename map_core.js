@@ -603,6 +603,7 @@ window.hideHolePopup = hideHolePopup;
 
 function showHolePopup(hole) {
   const popup = document.getElementById("holePopup");
+  console.log("SHOW HOLE POPUP", hole);
   if (!popup) {
     console.warn("showHolePopup(): missing holePopup");
     return;
@@ -651,20 +652,23 @@ function handleMapTapAtCanvasPoint(cx, cy, clientX = null, clientY = null) {
       if (typeof window.safeDrawGolf === "function") {
         window.safeDrawGolf();
       }
-      console.log("GOLF HIT RESULT:", { hole: hole.hole_number, hole_name: hole.holename });
+      console.log("GOLF HOLE HIT RESULT:", { hole: hole.hole_number, hole_name: hole.holename });
       return true;
     }
   }
 
   if (window.ENABLE_EVENTS && clientX != null && clientY != null) {
     const ev = findEventAt(cx, cy);
+	console.log("EVENT HIT", ev);
     if (ev) {
       hideHolePopup();
       showEventPopup(ev, clientX, clientY);
+	  console.log("SHOW EVENT POPUP", ev);
       return true;
     }
 
     const site = findMappedSiteAt(cx, cy);
+	console.log("MAPPED SITE HIT", site);
     if (site) {
       const siteId = site.siteId || site.id || site.name;
       const siteEvent = findEventForSite(siteId);
@@ -699,6 +703,14 @@ function handleCanvasTap(clientX, clientY, shiftLike = false) {
   const pt = getCanvasXYFromClient(clientX, clientY);
   const cx = pt.x;
   const cy = pt.y;
+  
+  console.log("HANDLE CANVAS TAP", {
+  clientX,
+  clientY,
+  zoomScale,
+  scrollLeft: mapWrapper ? mapWrapper.scrollLeft : null,
+  scrollTop: mapWrapper ? mapWrapper.scrollTop : null
+});
 
   try {
     if (window.GOLF_EDIT && window.GOLF_EDIT.enabled && window.GOLF_OVERLAY_DATA) {
@@ -747,7 +759,7 @@ function handleCanvasTap(clientX, clientY, shiftLike = false) {
     digitizeNextHole++;
     return;
   }
-console.log("Calling handleMapTapAtCanvasPoint", cx, cy);
+console.log("MAP TAP AT CANVAS POINT", { cx, cy, clientX, clientY });
   handleMapTapAtCanvasPoint(cx, cy, clientX, clientY);
 }
 console.trace("CALLING setupCanvasEvents");

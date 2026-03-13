@@ -43,8 +43,7 @@ function drawLots() {
   }
 
   const showSeasonStations = !!window.ENABLE_SEASON_STATIONS;
-if (typeof window.drawGolfOverlay === "function") {
-  window.drawGolfOverlay(ctx);
+
 }
   // 1) Base map (force raw canvas coordinate space)
   if (typeof ctx.resetTransform === "function") {
