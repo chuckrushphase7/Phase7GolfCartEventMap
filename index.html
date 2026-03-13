@@ -14,7 +14,7 @@
 <meta name="theme-color" content="#0b3d2e">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Phase7 Golf">
-
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
   <style>
     html, body {
       margin: 0;
@@ -329,28 +329,26 @@ toggle.addEventListener("change", function () {
   courseSel.innerHTML = "";
   holeSel.innerHTML = "";
 
-  function setActive() {
-    window.GOLF_ACTIVE_COURSE = courseSel.value || "";
-    window.GOLF_ACTIVE_HOLE = holeSel.value ? Number(holeSel.value) : null;
+function setActive() {
+  window.GOLF_ACTIVE_COURSE = courseSel.value || "";
+  window.GOLF_ACTIVE_HOLE = holeSel.value ? Number(holeSel.value) : null;
 
-    // IMPORTANT: this drives the highlight ring
-    window.selectedHole = holeSel.value ? Number(holeSel.value) : null;
-    window.GOLF_SELECTED_HOLE_NUMBER = window.selectedHole;
+  // Single source of truth for selected golf hole
+  window.GOLF_SELECTED_HOLE = holeSel.value ? Number(holeSel.value) : null;
 
-    localStorage.setItem("GOLF_ACTIVE_COURSE", window.GOLF_ACTIVE_COURSE);
-    localStorage.setItem("GOLF_ACTIVE_HOLE", holeSel.value || "");
+  localStorage.setItem("GOLF_ACTIVE_COURSE", window.GOLF_ACTIVE_COURSE);
+  localStorage.setItem("GOLF_ACTIVE_HOLE", holeSel.value || "");
 
-    if (typeof window.safeDrawGolf === "function") {
-      window.safeDrawGolf();
-    }
-
-    if (typeof window.safeDrawLots === "function") {
-      window.safeDrawLots();
-    } else if (typeof window.drawLots === "function") {
-      window.drawLots();
-    }
+  if (typeof window.safeDrawGolf === "function") {
+    window.safeDrawGolf();
   }
 
+  if (typeof window.safeDrawLots === "function") {
+    window.safeDrawLots();
+  } else if (typeof window.drawLots === "function") {
+    window.drawLots();
+  }
+}
   function rebuildHoles() {
     const courseName = courseSel.value;
     const course =
