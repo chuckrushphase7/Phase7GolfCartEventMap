@@ -1,5 +1,6 @@
 // draw_sites.js
 // Handles drawing mapped parks & ponds using MAPPED_SITES from mapped_sites.js.
+// draw_sites.js
 
 const DEBUG_POLYGONS = false;
 
