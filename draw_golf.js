@@ -487,7 +487,7 @@ window.findGolfHoleAt = function (x, y) {
 
     // Main route (smoothed + simplified display)
     const ptsRaw = (course.paths && course.paths.main) ? course.paths.main : [];
-    const pts = simplifyRDP(ptsRaw, RDP_EPSILON);
+	const pts = ptsRaw;
 
     ctx.save();
     ctx.globalAlpha = 1;
@@ -503,8 +503,8 @@ for (const h of holes) {
   const hn = Number(h.hole_number);
   if (!Number.isFinite(hn)) continue;
 
-  const isSel = (window.selectedHole != null) ? (hn === Number(window.selectedHole)) : false;
-
+  const hasSelectedHole = Number.isFinite(selectedHole);
+	const isSel = hasSelectedHole && hn === selectedHole;
   // Tee
   const tx = Number(h.tee_x);
   const ty = Number(h.tee_y);
@@ -526,8 +526,8 @@ for (const h of holes) {
     let alpha = 1;
 
     // Dim non-selected holes when one is selected
-    if (window.selectedHole != null && !isSel) {
-      alpha = 0.55;
+	if (hasSelectedHole && !isSel) {
+	alpha = 0.55;
     }
 
 // Make selected hole label pulse
