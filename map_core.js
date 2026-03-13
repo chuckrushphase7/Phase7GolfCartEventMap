@@ -642,16 +642,23 @@ function handleMapTapAtCanvasPoint(cx, cy, clientX = null, clientY = null) {
   console.log("handleMapTapAtCanvasPoint entered", cx, cy);
   if (typeof window.findGolfHoleAt === "function") {
     const hole = window.findGolfHoleAt(cx, cy);
-    if (hole) {
-	window.GOLF_SELECTED_HOLE = Number(hole.hole_number);
-      hidePopup();
-      if (typeof window.centerMapOn === "function") {
-        window.centerMapOn(hole.flag_x, hole.flag_y);
-      }
-      showHolePopup(hole);
-      if (typeof window.safeDrawGolf === "function") {
-        window.safeDrawGolf();
-      }
+if (hole) {
+  window.GOLF_SELECTED_HOLE = Number(hole.hole_number);
+  hidePopup();
+  if (typeof window.centerMapOn === "function") {
+    window.centerMapOn(hole.flag_x, hole.flag_y);
+  }
+  showHolePopup(hole);
+
+  if (typeof window.safeDrawLots === "function") {
+    window.safeDrawLots();
+  } else if (typeof window.drawLots === "function") {
+    window.drawLots();
+  }
+
+  console.log("GOLF HOLE HIT RESULT:", { hole: hole.hole_number, hole_name: hole.holename });
+  return true;
+}
       console.log("GOLF HOLE HIT RESULT:", { hole: hole.hole_number, hole_name: hole.holename });
       return true;
     }
