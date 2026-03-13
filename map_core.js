@@ -229,14 +229,39 @@ window.digitizeExport = function () {
 
 // Map-wrapper aware coordinate conversion (preserves 1500x1500 pixel space)
 function getCanvasXYFromClient(clientX, clientY) {
-  const wrapRect = mapWrapper.getBoundingClientRect();
+  const wrap = mapWrapper || document.getElementById("mapWrapper");
+  const canv = canvas || document.getElementById("mapCanvas");
+
+  if (!wrap || !canv) {
+    return { x: 0, y: 0 };
+  }
+
+  const wrapRect = wrap.getBoundingClientRect();
+
   const xInWrap = clientX - wrapRect.left;
   const yInWrap = clientY - wrapRect.top;
 
-  const xContent = (xInWrap + mapWrapper.scrollLeft) / zoomScale;
-  const yContent = (yInWrap + mapWrapper.scrollTop) / zoomScale;
+  const xContent = (xInWrap + wrap.scrollLeft) / zoomScale;
+  const yContent = (yInWrap + wrap.scrollTop) / zoomScale;
 
-  return { x: xContent, y: yContent };
+  console.log("getCanvasXYFromClient", {
+    clientX,
+    clientY,
+    wrapLeft: wrapRect.left,
+    wrapTop: wrapRect.top,
+    xInWrap,
+    yInWrap,
+    scrollLeft: wrap.scrollLeft,
+    scrollTop: wrap.scrollTop,
+    zoomScale,
+    xContent,
+    yContent
+  });
+
+  return {
+    x: xContent,
+    y: yContent
+  };
 }
 
 // Layout-based zoom: resize canvas via CSS; keep canvas pixel space constant
@@ -737,7 +762,11 @@ function handleCanvasTap(clientX, clientY, shiftLike = false) {
             hole.flag_y = Math.round(cy);
             console.log("Set FLAG for", course.course_name, "hole", hn, "=>", hole.flag_x, hole.flag_y);
           }
-          safeDrawLots();
+		if (typeof window.safeDrawLots === "function") {
+		  window.safeDrawLots();
+		} else if (typeof window.drawLots === "function") {
+		  window.drawLots();
+		}
           return;
         }
       }
