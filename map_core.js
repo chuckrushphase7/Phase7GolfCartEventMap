@@ -665,41 +665,48 @@ window.showHolePopup = showHolePopup;
 
 function handleMapTapAtCanvasPoint(cx, cy, clientX = null, clientY = null) {
   console.log("handleMapTapAtCanvasPoint entered", cx, cy);
+
   if (typeof window.findGolfHoleAt === "function") {
     const hole = window.findGolfHoleAt(cx, cy);
-if (hole) {
-  window.GOLF_SELECTED_HOLE = Number(hole.hole_number);
-  hidePopup();
-  if (typeof window.centerMapOn === "function") {
-    window.centerMapOn(hole.flag_x, hole.flag_y);
-  }
-  showHolePopup(hole);
 
-  if (typeof window.safeDrawLots === "function") {
-    window.safeDrawLots();
-  } else if (typeof window.drawLots === "function") {
-    window.drawLots();
-  }
+    if (hole) {
+      window.GOLF_SELECTED_HOLE = Number(hole.hole_number);
+      hidePopup();
 
-  console.log("GOLF HOLE HIT RESULT:", { hole: hole.hole_number, hole_name: hole.holename });
-  return true;
-}
-      console.log("GOLF HOLE HIT RESULT:", { hole: hole.hole_number, hole_name: hole.holename });
+      if (typeof window.centerMapOn === "function") {
+        window.centerMapOn(hole.flag_x, hole.flag_y);
+      }
+
+      showHolePopup(hole);
+
+      if (typeof window.safeDrawLots === "function") {
+        window.safeDrawLots();
+      } else if (typeof window.drawLots === "function") {
+        window.drawLots();
+      }
+
+      console.log("GOLF HOLE HIT RESULT:", {
+        hole: hole.hole_number,
+        hole_name: hole.holename
+      });
+
       return true;
     }
+  }
 
   if (window.ENABLE_EVENTS && clientX != null && clientY != null) {
     const ev = findEventAt(cx, cy);
-	console.log("EVENT HIT", ev);
+    console.log("EVENT HIT", ev);
+
     if (ev) {
       hideHolePopup();
       showEventPopup(ev, clientX, clientY);
-	  console.log("SHOW EVENT POPUP", ev);
       return true;
     }
 
     const site = findMappedSiteAt(cx, cy);
-	console.log("MAPPED SITE HIT", site);
+    console.log("MAPPED SITE HIT", site);
+
     if (site) {
       const siteId = site.siteId || site.id || site.name;
       const siteEvent = findEventForSite(siteId);
@@ -711,22 +718,21 @@ if (hole) {
     }
   }
 
-if (clientX != null && clientY != null) {
-  if (window.RESIDENT_MODE) {
-    const lot = findLotAt(Math.round(cx), Math.round(cy));
-    if (lot) {
-      hideHolePopup();
-      showpopup(lot, clientX, clientY);
-      return true;
+  if (clientX != null && clientY != null) {
+    if (window.RESIDENT_MODE) {
+      const lot = findLotAt(Math.round(cx), Math.round(cy));
+      if (lot) {
+        hideHolePopup();
+        showpopup(lot, clientX, clientY);
+        return true;
+      }
     }
   }
-}
 
   hidePopup();
   hideHolePopup();
   return false;
 }
-
 function handleCanvasTap(clientX, clientY, shiftLike = false) {
   
 
