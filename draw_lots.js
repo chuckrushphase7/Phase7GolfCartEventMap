@@ -19,7 +19,7 @@ function shouldShowLot(lot) {
 
   const seasonOnly = !!window.isSeasonOnly;
   const showSeasonStations = !!window.ENABLE_SEASON_STATIONS;
-
+  
   if (seasonOnly) {
     if (!isSeasonStation(lot)) return false;
     if (!showSeasonStations) return false;
@@ -44,7 +44,6 @@ function drawLots() {
 
   const showSeasonStations = !!window.ENABLE_SEASON_STATIONS;
 
-}
   // 1) Base map (force raw canvas coordinate space)
   if (typeof ctx.resetTransform === "function") {
     ctx.resetTransform();
