@@ -654,8 +654,7 @@ function handleMapTapAtCanvasPoint(cx, cy, clientX = null, clientY = null) {
   }
 
   if (clientX != null && clientY != null) {
-    const residentModeActive = (window.MODE === "resident") || !!window.RESIDENT_MODE;
-    if (residentModeActive) {
+    if (window.RESIDENT_MODE) {
       const lot = findLotAt(Math.round(cx), Math.round(cy));
       if (lot) {
         hideHolePopup();
