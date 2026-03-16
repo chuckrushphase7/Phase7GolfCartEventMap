@@ -248,7 +248,7 @@ function getCanvasXYFromClient(clientX, clientY) {
     rectTop: rect.top,
     rectWidth: rect.width,
     rectHeight: rect.height,
-    window.zoomScale: z,
+    zoomScale: z,
     x,
     y
   });
