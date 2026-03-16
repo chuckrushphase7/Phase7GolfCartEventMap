@@ -706,7 +706,11 @@ function handleCanvasTap(clientX, clientY, shiftLike = false) {
   const pt = getCanvasXYFromClient(clientX, clientY);
   const cx = pt.x;
   const cy = pt.y;
-  
+  alert(
+  "z:" + (window.zoomScale || 1).toFixed(2) +
+  " x:" + cx.toFixed(0) +
+  " y:" + cy.toFixed(0)
+);
    const holePopup = document.getElementById("holePopup");
   const holeTitle = document.getElementById("holeTitle");
   const holeText = document.getElementById("holeText");
