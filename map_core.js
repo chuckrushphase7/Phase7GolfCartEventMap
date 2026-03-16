@@ -707,6 +707,10 @@ function handleCanvasTap(clientX, clientY, shiftLike = false) {
   const cx = pt.x;
   const cy = pt.y;
   
+  popup.innerHTML += "<br>z:" + window.zoomScale.toFixed(2) +
+                   " x:" + cx.toFixed(0) +
+                   " y:" + cy.toFixed(0);
+  
   console.log("HANDLE CANVAS TAP", {
   clientX,
   clientY,
