@@ -438,8 +438,8 @@ console.log("DRAW_GOLF VERSION STAMP: 2026-03-13 FIX C");
     const course = getActiveCourse();
     if (!course) return;
 
-    const ptsRaw = (course.paths && course.paths.main) ? course.paths.main : [];
-    const pts = ptsRaw; // keep raw points while debugging mobile/selection behavior
+	const ptsRaw = (course.paths && course.paths.main) ? course.paths.main : [];
+	const pts = simplifyRDP(ptsRaw, RDP_EPSILON);
 
     ctx.save();
     ctx.globalAlpha = 1;
