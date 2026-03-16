@@ -706,11 +706,15 @@ function handleCanvasTap(clientX, clientY, shiftLike = false) {
   const pt = getCanvasXYFromClient(clientX, clientY);
   const cx = pt.x;
   const cy = pt.y;
-  alert(
-  "z:" + (window.zoomScale || 1).toFixed(2) +
-  " x:" + cx.toFixed(0) +
-  " y:" + cy.toFixed(0)
-);
+const dbg = document.getElementById("debugTap");
+if (dbg) {
+  dbg.innerHTML =
+    "z:" + (window.zoomScale || 1).toFixed(2) +
+    " x:" + cx.toFixed(0) +
+    " y:" + cy.toFixed(0) +
+    " sl:" + (mapWrapper ? mapWrapper.scrollLeft : "n/a") +
+    " st:" + (mapWrapper ? mapWrapper.scrollTop : "n/a");
+}
    const holePopup = document.getElementById("holePopup");
   const holeTitle = document.getElementById("holeTitle");
   const holeText = document.getElementById("holeText");
