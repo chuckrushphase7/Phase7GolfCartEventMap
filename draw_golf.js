@@ -7,7 +7,7 @@ console.log("DRAW_GOLF VERSION STAMP: 2026-03-13 FIX C");
 (function () {
   "use strict";
 
-  const RDP_EPSILON = 2.2;
+  const RDP_EPSILON = 1.2;
   const BASE_ROUTE_W = 8;
   const INNER_ROUTE_W = 3.6;
   const SELECT_ROUTE_W = 10;
