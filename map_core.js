@@ -229,31 +229,36 @@ window.digitizeExport = function () {
 
 // Map-wrapper aware coordinate conversion (preserves 1500x1500 pixel space)
 function getCanvasXYFromClient(clientX, clientY) {
+  const wrap = mapWrapper || document.getElementById("mapWrapper");
   const canv = canvas || document.getElementById("mapCanvas");
   const z = Number(window.zoomScale) || 1;
 
-  if (!canv) {
+  if (!wrap || !canv) {
     return { x: 0, y: 0 };
   }
 
-  const rect = canv.getBoundingClientRect();
+  const coarsePointer =
+    typeof window !== "undefined" &&
+    window.matchMedia &&
+    window.matchMedia("(pointer: coarse)").matches;
 
-  const x = (clientX - rect.left) / z;
-  const y = (clientY - rect.top) / z;
+  if (coarsePointer) {
+    const rect = canv.getBoundingClientRect();
 
-  console.log("getCanvasXYFromClient", {
-    clientX,
-    clientY,
-    rectLeft: rect.left,
-    rectTop: rect.top,
-    rectWidth: rect.width,
-    rectHeight: rect.height,
-    zoomScale: z,
-    x,
-    y
-  });
+    return {
+      x: (clientX - rect.left) / z,
+      y: (clientY - rect.top) / z
+    };
+  }
 
-  return { x, y };
+  const wrapRect = wrap.getBoundingClientRect();
+  const xInWrap = clientX - wrapRect.left;
+  const yInWrap = clientY - wrapRect.top;
+
+  return {
+    x: (xInWrap + wrap.scrollLeft) / z,
+    y: (yInWrap + wrap.scrollTop) / z
+  };
 }
 
 // Layout-based zoom: resize canvas via CSS; keep canvas pixel space constant
