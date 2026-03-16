@@ -121,7 +121,7 @@ function safeDrawLots() {
   }
 }
 
-let zoomScale = 1;
+window.zoomScale = Number(window.zoomScale) || 1;
 
 // LOTS from phase7_merged_lots.js
 const LOTS = typeof phaseResidentsData !== "undefined" ? phaseResidentsData : [];
@@ -230,44 +230,41 @@ window.digitizeExport = function () {
 // Map-wrapper aware coordinate conversion (preserves 1500x1500 pixel space)
 function getCanvasXYFromClient(clientX, clientY) {
   const wrap = mapWrapper || document.getElementById("mapWrapper");
-  const canv = canvas || document.getElementById("mapCanvas");
-  const z = Number(window.zoomScale) || 1;
-
-  if (!wrap || !canv) {
+  if (!wrap) {
     return { x: 0, y: 0 };
   }
 
-  const coarsePointer =
-    typeof window !== "undefined" &&
-    window.matchMedia &&
-    window.matchMedia("(pointer: coarse)").matches;
-
-  if (coarsePointer) {
-    const rect = canv.getBoundingClientRect();
-
-    return {
-      x: (clientX - rect.left) / z,
-      y: (clientY - rect.top) / z
-    };
-  }
-
-  const wrapRect = wrap.getBoundingClientRect();
-  const xInWrap = clientX - wrapRect.left;
-  const yInWrap = clientY - wrapRect.top;
+  const rect = wrap.getBoundingClientRect();
+  const z = Number(window.zoomScale) || 1;
 
   return {
-    x: (xInWrap + wrap.scrollLeft) / z,
-    y: (yInWrap + wrap.scrollTop) / z
+    x: (wrap.scrollLeft + (clientX - rect.left)) / z,
+    y: (wrap.scrollTop + (clientY - rect.top)) / z
   };
 }
 
 // Layout-based zoom: resize canvas via CSS; keep canvas pixel space constant
 function setZoom(scale) {
-  zoomScale = Math.max(0.25, Math.min(2.5, scale));
+  window.zoomScale = Math.max(0.25, Math.min(2.5, Number(scale) || 1));
+
+  if (typeof window.applyMapZoom === "function") {
+    window.applyMapZoom();
+    return;
+  }
+
   const c = document.getElementById("mapCanvas");
+  const zoom = document.getElementById("mapZoom");
   if (!c || !c.width || !c.height) return;
-  c.style.width = c.width * zoomScale + "px";
-  c.style.height = c.height * zoomScale + "px";
+
+  const z = Number(window.zoomScale) || 1;
+
+  if (zoom) {
+    zoom.style.width = (c.width * z) + "px";
+    zoom.style.height = (c.height * z) + "px";
+  }
+
+  c.style.width = (c.width * z) + "px";
+  c.style.height = (c.height * z) + "px";
 }
 window.setZoom = setZoom;
 
@@ -702,35 +699,6 @@ function handleCanvasTap(clientX, clientY, shiftLike = false) {
   const pt = getCanvasXYFromClient(clientX, clientY);
   const cx = pt.x;
   const cy = pt.y;
-const dbg = document.getElementById("debugTap");
-if (dbg) {
-  dbg.innerHTML =
-    "z:" + (window.zoomScale || 1).toFixed(2) +
-    " x:" + cx.toFixed(0) +
-    " y:" + cy.toFixed(0) +
-    " sl:" + (mapWrapper ? mapWrapper.scrollLeft : "n/a") +
-    " st:" + (mapWrapper ? mapWrapper.scrollTop : "n/a");
-}
-   const holePopup = document.getElementById("holePopup");
-  const holeTitle = document.getElementById("holeTitle");
-  const holeText = document.getElementById("holeText");
-
-  if (holePopup && holeTitle && holeText) {
-    holeTitle.textContent = "DEBUG";
-    holeText.innerHTML =
-      "z: " + (window.zoomScale || 1).toFixed(2) +
-      "<br>x: " + cx.toFixed(0) +
-      "<br>y: " + cy.toFixed(0);
-    holePopup.classList.remove("hidden");
-  }
-
-  console.log("HANDLE CANVAS TAP", {
-    clientX,
-    clientY,
-    zoomScale: window.zoomScale,
-    scrollLeft: mapWrapper ? mapWrapper.scrollLeft : null,
-    scrollTop: mapWrapper ? mapWrapper.scrollTop : null
-  });
 
 
   try {
@@ -784,10 +752,8 @@ if (dbg) {
     digitizeNextHole++;
     return;
   }
-console.log("MAP TAP AT CANVAS POINT", { cx, cy, clientX, clientY });
   handleMapTapAtCanvasPoint(cx, cy, clientX, clientY);
 }
-console.trace("CALLING setupCanvasEvents");
 function setupCanvasEvents() {
   const target = document.getElementById("mapWrapper") || canvas;
   if (!target) return;
@@ -1047,12 +1013,14 @@ safeDrawLots();
 function centerMapOn(x, y) {
   const wrapper = document.getElementById("mapWrapper");
   if (!wrapper) return;
-        console.log("Center Map On Function");
-  const rect = wrapper.getBoundingClientRect();
 
-  wrapper.scrollLeft = Math.max(0, x * zoomScale - rect.width / 2);
-  wrapper.scrollTop = Math.max(0, y * zoomScale - rect.height / 2);
+  const rect = wrapper.getBoundingClientRect();
+  const z = Number(window.zoomScale) || 1;
+
+  wrapper.scrollLeft = Math.max(0, x * z - rect.width / 2);
+  wrapper.scrollTop = Math.max(0, y * z - rect.height / 2);
 }
+window.centerMapOn = centerMapOn;
 // ------------------------
 // Startup (SINGLE PATH)
 // ------------------------
