@@ -707,17 +707,27 @@ function handleCanvasTap(clientX, clientY, shiftLike = false) {
   const cx = pt.x;
   const cy = pt.y;
   
-  popup.innerHTML += "<br>z:" + window.zoomScale.toFixed(2) +
-                   " x:" + cx.toFixed(0) +
-                   " y:" + cy.toFixed(0);
-  
+   const holePopup = document.getElementById("holePopup");
+  const holeTitle = document.getElementById("holeTitle");
+  const holeText = document.getElementById("holeText");
+
+  if (holePopup && holeTitle && holeText) {
+    holeTitle.textContent = "DEBUG";
+    holeText.innerHTML =
+      "z: " + (window.zoomScale || 1).toFixed(2) +
+      "<br>x: " + cx.toFixed(0) +
+      "<br>y: " + cy.toFixed(0);
+    holePopup.classList.remove("hidden");
+  }
+
   console.log("HANDLE CANVAS TAP", {
-  clientX,
-  clientY,
-  zoomScale,
-  scrollLeft: mapWrapper ? mapWrapper.scrollLeft : null,
-  scrollTop: mapWrapper ? mapWrapper.scrollTop : null
-});
+    clientX,
+    clientY,
+    zoomScale: window.zoomScale,
+    scrollLeft: mapWrapper ? mapWrapper.scrollLeft : null,
+    scrollTop: mapWrapper ? mapWrapper.scrollTop : null
+  });
+
 
   try {
     if (window.GOLF_EDIT && window.GOLF_EDIT.enabled && window.GOLF_OVERLAY_DATA) {
