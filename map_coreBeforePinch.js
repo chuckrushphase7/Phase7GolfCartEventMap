@@ -1,8 +1,9 @@
 // map_core.js
 // Core Phase 7 app logic: state, popups, map init, APK button.
-//Fix Mobile Click
 "use strict";
-
+console.log("========== LMHH MAP BUILD ==========");
+console.log("Build loaded:", new Date().toLocaleString());
+console.log("====================================");
 console.log("MAP_CORE LOADED MARKER v3", new Date().toISOString());
 const RESIDENT_PASSWORD = "parrotHead";
 // Default events ON unless explicitly set to false somewhere else BEFORE this file loads
@@ -143,12 +144,18 @@ let digitizeCurrentPath = null;
 // -----------------------------------
 let suppressNextCanvasClickUntil = 0;
 
-function suppressCanvasClicks(ms = 350) {
+function suppressCanvasClicks(ms = 800) {
   suppressNextCanvasClickUntil = Date.now() + ms;
 }
 
 function isCanvasClickSuppressed() {
-  return Date.now() < suppressNextCanvasClickUntil;
+  const suppressed = Date.now() < suppressNextCanvasClickUntil;
+  console.log("isCanvasClickSuppressed", {
+    now: Date.now(),
+    until: suppressNextCanvasClickUntil,
+    suppressed
+  });
+  return suppressed;
 }
 
 // -----------------------------------
@@ -222,14 +229,39 @@ window.digitizeExport = function () {
 
 // Map-wrapper aware coordinate conversion (preserves 1500x1500 pixel space)
 function getCanvasXYFromClient(clientX, clientY) {
-  const wrapRect = mapWrapper.getBoundingClientRect();
+  const wrap = mapWrapper || document.getElementById("mapWrapper");
+  const canv = canvas || document.getElementById("mapCanvas");
+
+  if (!wrap || !canv) {
+    return { x: 0, y: 0 };
+  }
+
+  const wrapRect = wrap.getBoundingClientRect();
+
   const xInWrap = clientX - wrapRect.left;
   const yInWrap = clientY - wrapRect.top;
 
-  const xContent = (xInWrap + mapWrapper.scrollLeft) / zoomScale;
-  const yContent = (yInWrap + mapWrapper.scrollTop) / zoomScale;
+  const xContent = (xInWrap + wrap.scrollLeft) / zoomScale;
+  const yContent = (yInWrap + wrap.scrollTop) / zoomScale;
 
-  return { x: xContent, y: yContent };
+  console.log("getCanvasXYFromClient", {
+    clientX,
+    clientY,
+    wrapLeft: wrapRect.left,
+    wrapTop: wrapRect.top,
+    xInWrap,
+    yInWrap,
+    scrollLeft: wrap.scrollLeft,
+    scrollTop: wrap.scrollTop,
+    zoomScale,
+    xContent,
+    yContent
+  });
+
+  return {
+    x: xContent,
+    y: yContent
+  };
 }
 
 // Layout-based zoom: resize canvas via CSS; keep canvas pixel space constant
@@ -521,18 +553,44 @@ function showEventPopup(ev, clientX, clientY) {
   const popup = document.getElementById("popup");
   if (!popup || !canvas || !mapWrapper) return;
 
-  const wrapperRect = mapWrapper.getBoundingClientRect();
-  const canvasRect = canvas.getBoundingClientRect();
-
   popup.innerHTML = buildEventPopupContent(ev);
+  
+  console.log("showEventPopup fired", ev);
+console.log("popup HTML:", popup.innerHTML);
+
   popup.classList.remove("hidden");
   popup.setAttribute("aria-hidden", "false");
   popup.style.display = "block";
   popup.style.visibility = "visible";
   popup.style.pointerEvents = "auto";
   enforcePopupTopLayer();
-
   wirePopupInterceptionAndClose(popup);
+
+// Mobile: show popup as fixed overlay
+if (window.innerWidth <= 768) {
+  popup.style.position = "fixed";
+  popup.style.left = "8px";
+  popup.style.right = "8px";
+  popup.style.top = "120px";
+  popup.style.width = "auto";
+  popup.style.maxWidth = "none";
+  popup.style.maxHeight = "34vh";
+  popup.style.overflow = "auto";
+  popup.style.zIndex = "20000";
+  return;
+}
+
+const popupRect = popup.getBoundingClientRect();
+
+  // Desktop: keep existing map-relative placement
+  popup.style.position = "absolute";
+  popup.style.right = "";
+  popup.style.width = "";
+  popup.style.maxHeight = "";
+  popup.style.overflow = "";
+
+  const wrapperRect = mapWrapper.getBoundingClientRect();
+  const canvasRect = canvas.getBoundingClientRect();
 
   const offsetX = canvasRect.left - wrapperRect.left;
   const offsetY = canvasRect.top - wrapperRect.top;
@@ -543,11 +601,7 @@ function showEventPopup(ev, clientX, clientY) {
   popup.style.left = left + "px";
   popup.style.top = top + "px";
 
-  const popupRect = popup.getBoundingClientRect();
 
-  if (window.innerWidth <= 768) {
-    left = (wrapperRect.width - popupRect.width) / 2;
-  }
 
   const maxLeft = wrapperRect.width - popupRect.width - 8;
   const maxTop = wrapperRect.height - popupRect.height - 8;
@@ -570,41 +624,53 @@ function hideHolePopup() {
   popup.style.visibility = "hidden";
   popup.style.pointerEvents = "none";
 }
+window.hideHolePopup = hideHolePopup;
 
 function showHolePopup(hole) {
   const popup = document.getElementById("holePopup");
-  const title = document.getElementById("holeTitle");
-  const text = document.getElementById("holeText");
-  if (!popup || !title || !text) {
-    console.warn("showHolePopup(): missing hole popup elements");
+  console.log("SHOW HOLE POPUP", hole);
+  if (!popup) {
+    console.warn("showHolePopup(): missing holePopup");
     return;
   }
 
   const courseName = window.GOLF_ACTIVE_COURSE || "Golf Course";
-  const holeName = hole.holename || ("Hole " + hole.hole_number);
-  title.textContent = courseName + " - " + holeName;
+  const holeNumber = hole?.hole_number ?? "";
+  const holeDisplay = holeNumber ? "Hole " + holeNumber : "Hole";
 
-  let line = "";
-  if (hole.par != null) line += "Par " + hole.par;
-  if (hole.handicap != null) {
-    if (line) line += " • ";
-    line += "Handicap " + hole.handicap;
-  }
-  text.textContent = line || "";
+  const actualHoleName =
+    hole?.holename ||
+    hole?.hole_name ||
+    hole?.name ||
+    holeDisplay;
+
+  const parText = "Par " + (hole?.par ?? "?");
+  const handicapText = "Handicap " + (hole?.handicap ?? 0);
+
+  popup.innerHTML = `
+    <div class="hole-popup-inner">
+      <div class="hole-line hole-line-1">${courseName} -- ${holeDisplay}</div>
+      <div class="hole-line hole-line-2">${actualHoleName}</div>
+      <div class="hole-line hole-line-3">${parText}&nbsp;&nbsp;&nbsp;&nbsp;${handicapText}</div>
+    </div>
+  `;
 
   popup.classList.remove("hidden");
   popup.style.display = "block";
   popup.style.visibility = "visible";
   popup.style.pointerEvents = "auto";
-
-  console.log("showHolePopup(): visible", popup.className, popup.style.display);
 }
 
+window.showHolePopup = showHolePopup;
+
 function handleMapTapAtCanvasPoint(cx, cy, clientX = null, clientY = null) {
+  console.log("handleMapTapAtCanvasPoint entered", cx, cy);
+
   if (typeof window.findGolfHoleAt === "function") {
     const hole = window.findGolfHoleAt(cx, cy);
+
     if (hole) {
-      window.selectedHole = Number(hole.hole_number);
+      window.GOLF_SELECTED_HOLE = Number(hole.hole_number);
       hidePopup();
 
       if (typeof window.centerMapOn === "function") {
@@ -613,20 +679,25 @@ function handleMapTapAtCanvasPoint(cx, cy, clientX = null, clientY = null) {
 
       showHolePopup(hole);
 
-      if (typeof window.safeDrawGolf === "function") {
-        window.safeDrawGolf();
+      if (typeof window.safeDrawLots === "function") {
+        window.safeDrawLots();
+      } else if (typeof window.drawLots === "function") {
+        window.drawLots();
       }
 
-      console.log("GOLF HIT RESULT:", {
+      console.log("GOLF HOLE HIT RESULT:", {
         hole: hole.hole_number,
-        hole_name: hole.holename,
+        hole_name: hole.holename
       });
+
       return true;
     }
   }
 
   if (window.ENABLE_EVENTS && clientX != null && clientY != null) {
     const ev = findEventAt(cx, cy);
+    console.log("EVENT HIT", ev);
+
     if (ev) {
       hideHolePopup();
       showEventPopup(ev, clientX, clientY);
@@ -634,6 +705,8 @@ function handleMapTapAtCanvasPoint(cx, cy, clientX = null, clientY = null) {
     }
 
     const site = findMappedSiteAt(cx, cy);
+    console.log("MAPPED SITE HIT", site);
+
     if (site) {
       const siteId = site.siteId || site.id || site.name;
       const siteEvent = findEventForSite(siteId);
@@ -646,11 +719,13 @@ function handleMapTapAtCanvasPoint(cx, cy, clientX = null, clientY = null) {
   }
 
   if (clientX != null && clientY != null) {
-    const lot = findLotAt(cx, cy);
-    if (lot) {
-      hideHolePopup();
-      showpopup(lot, clientX, clientY);
-      return true;
+    if (window.RESIDENT_MODE) {
+      const lot = findLotAt(Math.round(cx), Math.round(cy));
+      if (lot) {
+        hideHolePopup();
+        showpopup(lot, clientX, clientY);
+        return true;
+      }
     }
   }
 
@@ -658,13 +733,21 @@ function handleMapTapAtCanvasPoint(cx, cy, clientX = null, clientY = null) {
   hideHolePopup();
   return false;
 }
-
 function handleCanvasTap(clientX, clientY, shiftLike = false) {
-  if (isCanvasClickSuppressed()) return;
+  
+
 
   const pt = getCanvasXYFromClient(clientX, clientY);
   const cx = pt.x;
   const cy = pt.y;
+  
+  console.log("HANDLE CANVAS TAP", {
+  clientX,
+  clientY,
+  zoomScale,
+  scrollLeft: mapWrapper ? mapWrapper.scrollLeft : null,
+  scrollTop: mapWrapper ? mapWrapper.scrollTop : null
+});
 
   try {
     if (window.GOLF_EDIT && window.GOLF_EDIT.enabled && window.GOLF_OVERLAY_DATA) {
@@ -685,7 +768,11 @@ function handleCanvasTap(clientX, clientY, shiftLike = false) {
             hole.flag_y = Math.round(cy);
             console.log("Set FLAG for", course.course_name, "hole", hn, "=>", hole.flag_x, hole.flag_y);
           }
-          safeDrawLots();
+		if (typeof window.safeDrawLots === "function") {
+		  window.safeDrawLots();
+		} else if (typeof window.drawLots === "function") {
+		  window.drawLots();
+		}
           return;
         }
       }
@@ -713,13 +800,19 @@ function handleCanvasTap(clientX, clientY, shiftLike = false) {
     digitizeNextHole++;
     return;
   }
-
+console.log("MAP TAP AT CANVAS POINT", { cx, cy, clientX, clientY });
   handleMapTapAtCanvasPoint(cx, cy, clientX, clientY);
 }
-
+console.trace("CALLING setupCanvasEvents");
 function setupCanvasEvents() {
   const target = document.getElementById("mapWrapper") || canvas;
   if (!target) return;
+
+  if (target.dataset.eventsBound === "1") {
+    console.log("setupCanvasEvents: already bound, skipping");
+    return;
+  }
+  target.dataset.eventsBound = "1";
 
   let touchStartX = 0;
   let touchStartY = 0;
@@ -730,9 +823,22 @@ function setupCanvasEvents() {
   target.addEventListener(
     "click",
     function (e) {
+      console.log("TARGET CLICK HANDLER FIRED", {
+        suppressed: isCanvasClickSuppressed(),
+        x: e.clientX,
+        y: e.clientY,
+        target: e.target && e.target.id
+      });
+
+      if (isCanvasClickSuppressed()) {
+        e.preventDefault();
+        e.stopPropagation();
+        return;
+      }
+
       handleCanvasTap(e.clientX, e.clientY, !!e.shiftKey);
     },
-    { passive: true }
+    { passive: false }
   );
 
   target.addEventListener(
@@ -764,7 +870,8 @@ function setupCanvasEvents() {
       const t = e.touches[0];
       const dx = t.clientX - touchStartX;
       const dy = t.clientY - touchStartY;
-      if (Math.hypot(dx, dy) > 12) {
+
+      if (Math.hypot(dx, dy) > 24) {
         touchTracking = false;
       }
     },
@@ -793,6 +900,7 @@ function setupCanvasEvents() {
       }
 
       const t = e.changedTouches[0];
+      suppressCanvasClicks(800);
       handleCanvasTap(t.clientX, t.clientY, twoFinger);
 
       touchTracking = false;

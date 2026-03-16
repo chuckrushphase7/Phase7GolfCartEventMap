@@ -229,39 +229,16 @@ window.digitizeExport = function () {
 
 // Map-wrapper aware coordinate conversion (preserves 1500x1500 pixel space)
 function getCanvasXYFromClient(clientX, clientY) {
-  const wrap = mapWrapper || document.getElementById("mapWrapper");
-  const canv = canvas || document.getElementById("mapCanvas");
 
-  if (!wrap || !canv) {
-    return { x: 0, y: 0 };
-  }
+  const wrapper = document.getElementById("mapWrapper");
+  const rect = wrapper.getBoundingClientRect();
 
-  const wrapRect = wrap.getBoundingClientRect();
+  const zoom = window.zoomScale || 1;
 
-  const xInWrap = clientX - wrapRect.left;
-  const yInWrap = clientY - wrapRect.top;
+  const x = (wrapper.scrollLeft + (clientX - rect.left)) / zoom;
+  const y = (wrapper.scrollTop  + (clientY - rect.top))  / zoom;
 
-  const xContent = (xInWrap + wrap.scrollLeft) / zoomScale;
-  const yContent = (yInWrap + wrap.scrollTop) / zoomScale;
-
-  console.log("getCanvasXYFromClient", {
-    clientX,
-    clientY,
-    wrapLeft: wrapRect.left,
-    wrapTop: wrapRect.top,
-    xInWrap,
-    yInWrap,
-    scrollLeft: wrap.scrollLeft,
-    scrollTop: wrap.scrollTop,
-    zoomScale,
-    xContent,
-    yContent
-  });
-
-  return {
-    x: xContent,
-    y: yContent
-  };
+  return { x, y };
 }
 
 // Layout-based zoom: resize canvas via CSS; keep canvas pixel space constant
