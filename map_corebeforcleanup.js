@@ -229,39 +229,16 @@ window.digitizeExport = function () {
 
 // Map-wrapper aware coordinate conversion (preserves 1500x1500 pixel space)
 function getCanvasXYFromClient(clientX, clientY) {
-  const wrap = mapWrapper || document.getElementById("mapWrapper");
-  const canv = canvas || document.getElementById("mapCanvas");
 
-  if (!wrap || !canv) {
-    return { x: 0, y: 0 };
-  }
+  const wrapper = document.getElementById("mapWrapper");
+  const rect = wrapper.getBoundingClientRect();
 
-  const wrapRect = wrap.getBoundingClientRect();
+  const zoom = window.zoomScale || 1;
 
-  const xInWrap = clientX - wrapRect.left;
-  const yInWrap = clientY - wrapRect.top;
+  const x = (wrapper.scrollLeft + (clientX - rect.left)) / zoom;
+  const y = (wrapper.scrollTop  + (clientY - rect.top))  / zoom;
 
-  const xContent = (xInWrap + wrap.scrollLeft) / zoomScale;
-  const yContent = (yInWrap + wrap.scrollTop) / zoomScale;
-
-  console.log("getCanvasXYFromClient", {
-    clientX,
-    clientY,
-    wrapLeft: wrapRect.left,
-    wrapTop: wrapRect.top,
-    xInWrap,
-    yInWrap,
-    scrollLeft: wrap.scrollLeft,
-    scrollTop: wrap.scrollTop,
-    zoomScale,
-    xContent,
-    yContent
-  });
-
-  return {
-    x: xContent,
-    y: yContent
-  };
+  return { x, y };
 }
 
 // Layout-based zoom: resize canvas via CSS; keep canvas pixel space constant
@@ -369,21 +346,18 @@ function setupPrivacyPanel() {
 // ------------------------
 function buildPopupContent(lot) {
   const seasonDetails = getSeasonDetails(lot);
-  const mode = window.MODE || "resident";
+const mode = window.MODE || "resident";
 
-  if (mode === "event") {
-    return `
-      <div class="popup-inner">
-        <h3>Lot ${lot.lotNumber}</h3>
-        <button class="popup-close" type="button">Close</button>
-      </div>
-    `;
-  }
-
-  const allowResidentDetails = mode === "resident";
-
-  // Locked view (only applies outside resident mode)
-  if (!allowResidentDetails && !isUnlocked) {
+if (mode === "event") {
+  return `
+    <div class="popup-inner">
+      <h3>Lot ${lot.lotNumber}</h3>
+      <button class="popup-close" type="button">Close</button>
+    </div>
+  `;
+}
+  // Locked view
+  if (!isUnlocked) {
     if (window.ENABLE_SEASON_STATIONS && isSeasonStation(lot)) {
       return (
         '<div class="popup-inner">' +
@@ -497,25 +471,13 @@ function wirePopupInterceptionAndClose(popup) {
   }
 }
 
-function showPopupInTopBand(popup) {
-  if (!popup) return;
-  popup.style.position = "fixed";
-  popup.style.left = "8px";
-  popup.style.right = "8px";
-  popup.style.top = "60px";
-  popup.style.width = "auto";
-  popup.style.maxWidth = "none";
-  popup.style.maxHeight = "min(28vh, 160px)";
-  popup.style.overflow = "auto";
-  popup.style.boxSizing = "border-box";
-  popup.style.zIndex = "999999";
-}
-
 function showpopup(lot, clientX, clientY) {
   const popup = document.getElementById("popup");
-  if (!popup) return;
+  if (!popup || !canvas || !mapWrapper) return;
 
-  hideHolePopup();
+  const wrapperRect = mapWrapper.getBoundingClientRect();
+  const canvasRect = canvas.getBoundingClientRect();
+
   popup.innerHTML = buildPopupContent(lot);
   popup.classList.remove("hidden");
   popup.setAttribute("aria-hidden", "false");
@@ -523,21 +485,55 @@ function showpopup(lot, clientX, clientY) {
   popup.style.visibility = "visible";
   popup.style.pointerEvents = "auto";
   enforcePopupTopLayer();
-  wirePopupInterceptionAndClose(popup);
-  showPopupInTopBand(popup);
 
   console.log("SHOW LOT POPUP FIRED for lot:", lot && lot.lotNumber);
+  console.log(
+    "POPUP DEBUG:",
+    "closeBtn=",
+    !!popup.querySelector(".popup-close"),
+    "pointerEvents=",
+    getComputedStyle(popup).pointerEvents,
+    "zIndex=",
+    getComputedStyle(popup).zIndex
+  );
+
+  wirePopupInterceptionAndClose(popup);
+
+  const offsetX = canvasRect.left - wrapperRect.left;
+  const offsetY = canvasRect.top - wrapperRect.top;
+
+  let left = clientX - canvasRect.left + offsetX + 12;
+  let top = clientY - canvasRect.top + offsetY + 12;
+
+  popup.style.left = left + "px";
+  popup.style.top = top + "px";
+
+  const popupRect = popup.getBoundingClientRect();
+
+  if (window.innerWidth <= 768) {
+    left = (wrapperRect.width - popupRect.width) / 2;
+  }
+
+  const maxLeft = wrapperRect.width - popupRect.width - 8;
+  const maxTop = wrapperRect.height - popupRect.height - 8;
+
+  if (left < 8) left = 8;
+  if (left > maxLeft) left = maxLeft;
+  if (top < 8) top = 8;
+  if (top > maxTop) top = maxTop;
+
+  popup.style.left = left + "px";
+  popup.style.top = top + "px";
 }
 
 function showEventPopup(ev, clientX, clientY) {
   const popup = document.getElementById("popup");
-  if (!popup) return;
+  if (!popup || !canvas || !mapWrapper) return;
 
-  hideHolePopup();
   popup.innerHTML = buildEventPopupContent(ev);
-
+  
   console.log("showEventPopup fired", ev);
-  console.log("popup HTML:", popup.innerHTML);
+console.log("popup HTML:", popup.innerHTML);
 
   popup.classList.remove("hidden");
   popup.setAttribute("aria-hidden", "false");
@@ -546,7 +542,54 @@ function showEventPopup(ev, clientX, clientY) {
   popup.style.pointerEvents = "auto";
   enforcePopupTopLayer();
   wirePopupInterceptionAndClose(popup);
-  showPopupInTopBand(popup);
+
+// Mobile: show popup as fixed overlay
+if (window.innerWidth <= 768) {
+  popup.style.position = "fixed";
+  popup.style.left = "8px";
+  popup.style.right = "8px";
+  popup.style.top = "120px";
+  popup.style.width = "auto";
+  popup.style.maxWidth = "none";
+  popup.style.maxHeight = "34vh";
+  popup.style.overflow = "auto";
+  popup.style.zIndex = "20000";
+  return;
+}
+
+const popupRect = popup.getBoundingClientRect();
+
+  // Desktop: keep existing map-relative placement
+  popup.style.position = "absolute";
+  popup.style.right = "";
+  popup.style.width = "";
+  popup.style.maxHeight = "";
+  popup.style.overflow = "";
+
+  const wrapperRect = mapWrapper.getBoundingClientRect();
+  const canvasRect = canvas.getBoundingClientRect();
+
+  const offsetX = canvasRect.left - wrapperRect.left;
+  const offsetY = canvasRect.top - wrapperRect.top;
+
+  let left = clientX - canvasRect.left + offsetX + 12;
+  let top = clientY - canvasRect.top + offsetY + 12;
+
+  popup.style.left = left + "px";
+  popup.style.top = top + "px";
+
+
+
+  const maxLeft = wrapperRect.width - popupRect.width - 8;
+  const maxTop = wrapperRect.height - popupRect.height - 8;
+
+  if (left < 8) left = 8;
+  if (left > maxLeft) left = maxLeft;
+  if (top < 8) top = 8;
+  if (top > maxTop) top = maxTop;
+
+  popup.style.left = left + "px";
+  popup.style.top = top + "px";
 }
 
 function hideHolePopup() {
@@ -561,7 +604,6 @@ function hideHolePopup() {
 window.hideHolePopup = hideHolePopup;
 
 function showHolePopup(hole) {
-  hidePopup();
   const popup = document.getElementById("holePopup");
   console.log("SHOW HOLE POPUP", hole);
   if (!popup) {
