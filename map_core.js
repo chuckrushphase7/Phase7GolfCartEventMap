@@ -440,8 +440,24 @@ function buildPopupContent(lot) {
 // ------------------------
 // Hit testing + tap handling
 // ------------------------
-function findLotAt(x, y) {
-  const threshold = 25;
+function findLotAt(x, y, hitRadiusOverride = null) {
+  const coarsePointer =
+    (typeof window !== "undefined" &&
+      window.matchMedia &&
+      window.matchMedia("(pointer: coarse)").matches) || false;
+
+  const zoom = Number(window.zoomScale) || 1;
+
+  // Mobile touch after a large zoom can drift a little even when golf holes still hit.
+  // Make lot hit-testing more forgiving on coarse pointers / larger zoom levels.
+  let threshold =
+    hitRadiusOverride != null
+      ? Number(hitRadiusOverride)
+      : (coarsePointer ? 42 : 25);
+
+  if (coarsePointer && zoom >= 2) threshold = Math.max(threshold, 54);
+  if (coarsePointer && zoom >= 3) threshold = Math.max(threshold, 66);
+
   const thresholdSq = threshold * threshold;
   let best = null;
   let bestDist = thresholdSq;
@@ -656,7 +672,21 @@ function handleMapTapAtCanvasPoint(cx, cy, clientX = null, clientY = null) {
   if (clientX != null && clientY != null) {
     const residentModeActive = (window.MODE === "resident") || !!window.RESIDENT_MODE;
     if (residentModeActive) {
-      const lot = findLotAt(Math.round(cx), Math.round(cy));
+      let lot = findLotAt(cx, cy);
+
+      // Second-chance lookup for mobile taps after bigger zoom levels.
+      if (!lot) {
+        const zoom = Number(window.zoomScale) || 1;
+        const coarsePointer =
+          (typeof window !== "undefined" &&
+            window.matchMedia &&
+            window.matchMedia("(pointer: coarse)").matches) || false;
+
+        if (coarsePointer && zoom >= 2) {
+          lot = findLotAt(cx, cy, zoom >= 3 ? 72 : 60);
+        }
+      }
+
       if (lot) {
         hideHolePopup();
         showpopup(lot, clientX, clientY);
