@@ -410,7 +410,6 @@ function buildPopupContent(lot) {
 
   if (lot.address) parts.push("<p>" + lot.address + "</p>");
   if (lot.homeTypeStyle) parts.push("<p>Home: " + lot.homeTypeStyle + "</p>");
-  if (lot.contractStatus) parts.push("<p>Status: " + lot.contractStatus + "</p>");
 
   if (lot.isSensitive) {
     parts.push("<p><em>Details limited for privacy.</em></p>");
