@@ -229,39 +229,31 @@ window.digitizeExport = function () {
 
 // Map-wrapper aware coordinate conversion (preserves 1500x1500 pixel space)
 function getCanvasXYFromClient(clientX, clientY) {
-  const wrap = mapWrapper || document.getElementById("mapWrapper");
   const canv = canvas || document.getElementById("mapCanvas");
+  const z = Number(window.zoomScale) || 1;
 
-  if (!wrap || !canv) {
+  if (!canv) {
     return { x: 0, y: 0 };
   }
 
-  const wrapRect = wrap.getBoundingClientRect();
+  const rect = canv.getBoundingClientRect();
 
-  const xInWrap = clientX - wrapRect.left;
-  const yInWrap = clientY - wrapRect.top;
-
-  const xContent = (xInWrap + wrap.scrollLeft) / zoomScale;
-  const yContent = (yInWrap + wrap.scrollTop) / zoomScale;
+  const x = (clientX - rect.left) / z;
+  const y = (clientY - rect.top) / z;
 
   console.log("getCanvasXYFromClient", {
     clientX,
     clientY,
-    wrapLeft: wrapRect.left,
-    wrapTop: wrapRect.top,
-    xInWrap,
-    yInWrap,
-    scrollLeft: wrap.scrollLeft,
-    scrollTop: wrap.scrollTop,
-    zoomScale,
-    xContent,
-    yContent
+    rectLeft: rect.left,
+    rectTop: rect.top,
+    rectWidth: rect.width,
+    rectHeight: rect.height,
+    window.zoomScale: z,
+    x,
+    y
   });
 
-  return {
-    x: xContent,
-    y: yContent
-  };
+  return { x, y };
 }
 
 // Layout-based zoom: resize canvas via CSS; keep canvas pixel space constant
