@@ -1,0 +1,702 @@
+[
+  {
+    "table_name": "tbladmins",
+    "constraint_type": "CHECK",
+    "column_name": null,
+    "foreign_table": null,
+    "foreign_column": null
+  },
+  {
+    "table_name": "tbladmins",
+    "constraint_type": "CHECK",
+    "column_name": null,
+    "foreign_table": null,
+    "foreign_column": null
+  },
+  {
+    "table_name": "tbladmins",
+    "constraint_type": "FOREIGN KEY",
+    "column_name": "residentid",
+    "foreign_table": "tblresidents",
+    "foreign_column": "residentid"
+  },
+  {
+    "table_name": "tbladmins",
+    "constraint_type": "CHECK",
+    "column_name": null,
+    "foreign_table": null,
+    "foreign_column": null
+  },
+  {
+    "table_name": "tbladmins",
+    "constraint_type": "PRIMARY KEY",
+    "column_name": "adminid",
+    "foreign_table": "tbladmins",
+    "foreign_column": "adminid"
+  },
+  {
+    "table_name": "tbladmins",
+    "constraint_type": "CHECK",
+    "column_name": null,
+    "foreign_table": null,
+    "foreign_column": null
+  },
+  {
+    "table_name": "tbladmins",
+    "constraint_type": "CHECK",
+    "column_name": null,
+    "foreign_table": null,
+    "foreign_column": null
+  },
+  {
+    "table_name": "tbldebug_admin",
+    "constraint_type": "PRIMARY KEY",
+    "column_name": "id",
+    "foreign_table": "tbldebug_admin",
+    "foreign_column": "id"
+  },
+  {
+    "table_name": "tbldebug_admin",
+    "constraint_type": "CHECK",
+    "column_name": null,
+    "foreign_table": null,
+    "foreign_column": null
+  },
+  {
+    "table_name": "tblevents",
+    "constraint_type": "CHECK",
+    "column_name": null,
+    "foreign_table": null,
+    "foreign_column": null
+  },
+  {
+    "table_name": "tblevents",
+    "constraint_type": "CHECK",
+    "column_name": null,
+    "foreign_table": null,
+    "foreign_column": null
+  },
+  {
+    "table_name": "tblevents",
+    "constraint_type": "CHECK",
+    "column_name": null,
+    "foreign_table": null,
+    "foreign_column": null
+  },
+  {
+    "table_name": "tblevents",
+    "constraint_type": "CHECK",
+    "column_name": null,
+    "foreign_table": null,
+    "foreign_column": null
+  },
+  {
+    "table_name": "tblevents",
+    "constraint_type": "FOREIGN KEY",
+    "column_name": "lotid",
+    "foreign_table": "tbllots",
+    "foreign_column": "lotid"
+  },
+  {
+    "table_name": "tblevents",
+    "constraint_type": "PRIMARY KEY",
+    "column_name": "eventid",
+    "foreign_table": "tblevents",
+    "foreign_column": "eventid"
+  },
+  {
+    "table_name": "tblevents",
+    "constraint_type": "FOREIGN KEY",
+    "column_name": "siteid",
+    "foreign_table": "tblsites",
+    "foreign_column": "siteid"
+  },
+  {
+    "table_name": "tbleventseasons",
+    "constraint_type": "PRIMARY KEY",
+    "column_name": "eventseasonid",
+    "foreign_table": "tbleventseasons",
+    "foreign_column": "eventseasonid"
+  },
+  {
+    "table_name": "tbleventseasons",
+    "constraint_type": "FOREIGN KEY",
+    "column_name": "eventid",
+    "foreign_table": "tblevents",
+    "foreign_column": "eventid"
+  },
+  {
+    "table_name": "tbleventseasons",
+    "constraint_type": "CHECK",
+    "column_name": null,
+    "foreign_table": null,
+    "foreign_column": null
+  },
+  {
+    "table_name": "tbleventseasons",
+    "constraint_type": "CHECK",
+    "column_name": null,
+    "foreign_table": null,
+    "foreign_column": null
+  },
+  {
+    "table_name": "tblgolfcartpathpoints",
+    "constraint_type": "CHECK",
+    "column_name": null,
+    "foreign_table": null,
+    "foreign_column": null
+  },
+  {
+    "table_name": "tblgolfcartpathpoints",
+    "constraint_type": "CHECK",
+    "column_name": null,
+    "foreign_table": null,
+    "foreign_column": null
+  },
+  {
+    "table_name": "tblgolfcartpathpoints",
+    "constraint_type": "CHECK",
+    "column_name": null,
+    "foreign_table": null,
+    "foreign_column": null
+  },
+  {
+    "table_name": "tblgolfcartpathpoints",
+    "constraint_type": "CHECK",
+    "column_name": null,
+    "foreign_table": null,
+    "foreign_column": null
+  },
+  {
+    "table_name": "tblgolfcartpathpoints",
+    "constraint_type": "CHECK",
+    "column_name": null,
+    "foreign_table": null,
+    "foreign_column": null
+  },
+  {
+    "table_name": "tblgolfcartpathpoints",
+    "constraint_type": "CHECK",
+    "column_name": null,
+    "foreign_table": null,
+    "foreign_column": null
+  },
+  {
+    "table_name": "tblgolfcartpathpoints",
+    "constraint_type": "UNIQUE",
+    "column_name": "seq",
+    "foreign_table": "tblgolfcartpathpoints",
+    "foreign_column": "seq"
+  },
+  {
+    "table_name": "tblgolfcartpathpoints",
+    "constraint_type": "UNIQUE",
+    "column_name": "seq",
+    "foreign_table": "tblgolfcartpathpoints",
+    "foreign_column": "path_id"
+  },
+  {
+    "table_name": "tblgolfcartpathpoints",
+    "constraint_type": "UNIQUE",
+    "column_name": "path_id",
+    "foreign_table": "tblgolfcartpathpoints",
+    "foreign_column": "seq"
+  },
+  {
+    "table_name": "tblgolfcartpathpoints",
+    "constraint_type": "UNIQUE",
+    "column_name": "path_id",
+    "foreign_table": "tblgolfcartpathpoints",
+    "foreign_column": "path_id"
+  },
+  {
+    "table_name": "tblgolfcartpathpoints",
+    "constraint_type": "PRIMARY KEY",
+    "column_name": "point_id",
+    "foreign_table": "tblgolfcartpathpoints",
+    "foreign_column": "point_id"
+  },
+  {
+    "table_name": "tblgolfcartpathpoints",
+    "constraint_type": "FOREIGN KEY",
+    "column_name": "path_id",
+    "foreign_table": "tblgolfcartpaths",
+    "foreign_column": "path_id"
+  },
+  {
+    "table_name": "tblgolfcartpaths",
+    "constraint_type": "FOREIGN KEY",
+    "column_name": "course_id",
+    "foreign_table": "tblgolfcourses",
+    "foreign_column": "course_id"
+  },
+  {
+    "table_name": "tblgolfcartpaths",
+    "constraint_type": "FOREIGN KEY",
+    "column_name": "course_id",
+    "foreign_table": "tblgolfcourses",
+    "foreign_column": "course_id"
+  },
+  {
+    "table_name": "tblgolfcartpaths",
+    "constraint_type": "PRIMARY KEY",
+    "column_name": "path_id",
+    "foreign_table": "tblgolfcartpaths",
+    "foreign_column": "path_id"
+  },
+  {
+    "table_name": "tblgolfcartpaths",
+    "constraint_type": "UNIQUE",
+    "column_name": "course_id",
+    "foreign_table": "tblgolfcartpaths",
+    "foreign_column": "course_id"
+  },
+  {
+    "table_name": "tblgolfcartpaths",
+    "constraint_type": "UNIQUE",
+    "column_name": "course_id",
+    "foreign_table": "tblgolfcartpaths",
+    "foreign_column": "path_name"
+  },
+  {
+    "table_name": "tblgolfcartpaths",
+    "constraint_type": "UNIQUE",
+    "column_name": "point_seq",
+    "foreign_table": "tblgolfcartpaths",
+    "foreign_column": "point_seq"
+  },
+  {
+    "table_name": "tblgolfcartpaths",
+    "constraint_type": "UNIQUE",
+    "column_name": "point_seq",
+    "foreign_table": "tblgolfcartpaths",
+    "foreign_column": "course_id"
+  },
+  {
+    "table_name": "tblgolfcartpaths",
+    "constraint_type": "UNIQUE",
+    "column_name": "course_id",
+    "foreign_table": "tblgolfcartpaths",
+    "foreign_column": "point_seq"
+  },
+  {
+    "table_name": "tblgolfcartpaths",
+    "constraint_type": "UNIQUE",
+    "column_name": "course_id",
+    "foreign_table": "tblgolfcartpaths",
+    "foreign_column": "course_id"
+  },
+  {
+    "table_name": "tblgolfcartpaths",
+    "constraint_type": "UNIQUE",
+    "column_name": "path_name",
+    "foreign_table": "tblgolfcartpaths",
+    "foreign_column": "path_name"
+  },
+  {
+    "table_name": "tblgolfcartpaths",
+    "constraint_type": "CHECK",
+    "column_name": null,
+    "foreign_table": "tblgolfcartpaths",
+    "foreign_column": "geometry_type"
+  },
+  {
+    "table_name": "tblgolfcartpaths",
+    "constraint_type": "CHECK",
+    "column_name": null,
+    "foreign_table": null,
+    "foreign_column": null
+  },
+  {
+    "table_name": "tblgolfcartpaths",
+    "constraint_type": "CHECK",
+    "column_name": null,
+    "foreign_table": null,
+    "foreign_column": null
+  },
+  {
+    "table_name": "tblgolfcartpaths",
+    "constraint_type": "CHECK",
+    "column_name": null,
+    "foreign_table": null,
+    "foreign_column": null
+  },
+  {
+    "table_name": "tblgolfcartpaths",
+    "constraint_type": "CHECK",
+    "column_name": null,
+    "foreign_table": null,
+    "foreign_column": null
+  },
+  {
+    "table_name": "tblgolfcartpaths",
+    "constraint_type": "UNIQUE",
+    "column_name": "path_name",
+    "foreign_table": "tblgolfcartpaths",
+    "foreign_column": "course_id"
+  },
+  {
+    "table_name": "tblgolfcartpaths",
+    "constraint_type": "CHECK",
+    "column_name": null,
+    "foreign_table": "tblgolfcartpaths",
+    "foreign_column": "geometry_type"
+  },
+  {
+    "table_name": "tblgolfcourses",
+    "constraint_type": "CHECK",
+    "column_name": null,
+    "foreign_table": null,
+    "foreign_column": null
+  },
+  {
+    "table_name": "tblgolfcourses",
+    "constraint_type": "CHECK",
+    "column_name": null,
+    "foreign_table": null,
+    "foreign_column": null
+  },
+  {
+    "table_name": "tblgolfcourses",
+    "constraint_type": "PRIMARY KEY",
+    "column_name": "course_id",
+    "foreign_table": "tblgolfcourses",
+    "foreign_column": "course_id"
+  },
+  {
+    "table_name": "tblgolfcourses",
+    "constraint_type": "CHECK",
+    "column_name": null,
+    "foreign_table": null,
+    "foreign_column": null
+  },
+  {
+    "table_name": "tblgolfcourses",
+    "constraint_type": "CHECK",
+    "column_name": null,
+    "foreign_table": null,
+    "foreign_column": null
+  },
+  {
+    "table_name": "tblgolfcourseschedule",
+    "constraint_type": "CHECK",
+    "column_name": null,
+    "foreign_table": null,
+    "foreign_column": null
+  },
+  {
+    "table_name": "tblgolfcourseschedule",
+    "constraint_type": "FOREIGN KEY",
+    "column_name": "course_id",
+    "foreign_table": "tblgolfcourses",
+    "foreign_column": "course_id"
+  },
+  {
+    "table_name": "tblgolfcourseschedule",
+    "constraint_type": "PRIMARY KEY",
+    "column_name": "schedule_id",
+    "foreign_table": "tblgolfcourseschedule",
+    "foreign_column": "schedule_id"
+  },
+  {
+    "table_name": "tblgolfcourseschedule",
+    "constraint_type": "CHECK",
+    "column_name": null,
+    "foreign_table": null,
+    "foreign_column": null
+  },
+  {
+    "table_name": "tblgolfcourseschedule",
+    "constraint_type": "CHECK",
+    "column_name": null,
+    "foreign_table": null,
+    "foreign_column": null
+  },
+  {
+    "table_name": "tblgolfholes",
+    "constraint_type": "CHECK",
+    "column_name": null,
+    "foreign_table": null,
+    "foreign_column": null
+  },
+  {
+    "table_name": "tblgolfholes",
+    "constraint_type": "CHECK",
+    "column_name": null,
+    "foreign_table": null,
+    "foreign_column": null
+  },
+  {
+    "table_name": "tblgolfholes",
+    "constraint_type": "FOREIGN KEY",
+    "column_name": "course_id",
+    "foreign_table": "tblgolfcourses",
+    "foreign_column": "course_id"
+  },
+  {
+    "table_name": "tblgolfholes",
+    "constraint_type": "PRIMARY KEY",
+    "column_name": "hole_id",
+    "foreign_table": "tblgolfholes",
+    "foreign_column": "hole_id"
+  },
+  {
+    "table_name": "tblgolfholes",
+    "constraint_type": "UNIQUE",
+    "column_name": "course_id",
+    "foreign_table": "tblgolfholes",
+    "foreign_column": "course_id"
+  },
+  {
+    "table_name": "tblgolfholes",
+    "constraint_type": "UNIQUE",
+    "column_name": "course_id",
+    "foreign_table": "tblgolfholes",
+    "foreign_column": "hole_number"
+  },
+  {
+    "table_name": "tblgolfholes",
+    "constraint_type": "UNIQUE",
+    "column_name": "hole_number",
+    "foreign_table": "tblgolfholes",
+    "foreign_column": "course_id"
+  },
+  {
+    "table_name": "tblgolfholes",
+    "constraint_type": "UNIQUE",
+    "column_name": "hole_number",
+    "foreign_table": "tblgolfholes",
+    "foreign_column": "hole_number"
+  },
+  {
+    "table_name": "tblgolfholes",
+    "constraint_type": "CHECK",
+    "column_name": null,
+    "foreign_table": null,
+    "foreign_column": null
+  },
+  {
+    "table_name": "tblgolfholes",
+    "constraint_type": "CHECK",
+    "column_name": null,
+    "foreign_table": null,
+    "foreign_column": null
+  },
+  {
+    "table_name": "tblgolfholes",
+    "constraint_type": "CHECK",
+    "column_name": null,
+    "foreign_table": null,
+    "foreign_column": null
+  },
+  {
+    "table_name": "tblhometypestyles",
+    "constraint_type": "PRIMARY KEY",
+    "column_name": "hometypestyleid",
+    "foreign_table": "tblhometypestyles",
+    "foreign_column": "hometypestyleid"
+  },
+  {
+    "table_name": "tblhometypestyles",
+    "constraint_type": "CHECK",
+    "column_name": null,
+    "foreign_table": null,
+    "foreign_column": null
+  },
+  {
+    "table_name": "tbllotmappoints",
+    "constraint_type": "PRIMARY KEY",
+    "column_name": "mapassetid",
+    "foreign_table": "tbllotmappoints",
+    "foreign_column": "mapassetid"
+  },
+  {
+    "table_name": "tbllotmappoints",
+    "constraint_type": "PRIMARY KEY",
+    "column_name": "mapassetid",
+    "foreign_table": "tbllotmappoints",
+    "foreign_column": "lotid"
+  },
+  {
+    "table_name": "tbllotmappoints",
+    "constraint_type": "CHECK",
+    "column_name": null,
+    "foreign_table": null,
+    "foreign_column": null
+  },
+  {
+    "table_name": "tbllotmappoints",
+    "constraint_type": "PRIMARY KEY",
+    "column_name": "lotid",
+    "foreign_table": "tbllotmappoints",
+    "foreign_column": "lotid"
+  },
+  {
+    "table_name": "tbllotmappoints",
+    "constraint_type": "FOREIGN KEY",
+    "column_name": "mapassetid",
+    "foreign_table": "tblmapassets",
+    "foreign_column": "mapassetid"
+  },
+  {
+    "table_name": "tbllotmappoints",
+    "constraint_type": "FOREIGN KEY",
+    "column_name": "lotid",
+    "foreign_table": "tbllots",
+    "foreign_column": "lotid"
+  },
+  {
+    "table_name": "tbllotmappoints",
+    "constraint_type": "PRIMARY KEY",
+    "column_name": "lotid",
+    "foreign_table": "tbllotmappoints",
+    "foreign_column": "mapassetid"
+  },
+  {
+    "table_name": "tbllotmappoints",
+    "constraint_type": "CHECK",
+    "column_name": null,
+    "foreign_table": null,
+    "foreign_column": null
+  },
+  {
+    "table_name": "tbllotresidents",
+    "constraint_type": "CHECK",
+    "column_name": null,
+    "foreign_table": null,
+    "foreign_column": null
+  },
+  {
+    "table_name": "tbllotresidents",
+    "constraint_type": "CHECK",
+    "column_name": null,
+    "foreign_table": null,
+    "foreign_column": null
+  },
+  {
+    "table_name": "tbllotresidents",
+    "constraint_type": "CHECK",
+    "column_name": null,
+    "foreign_table": null,
+    "foreign_column": null
+  },
+  {
+    "table_name": "tbllotresidents",
+    "constraint_type": "CHECK",
+    "column_name": null,
+    "foreign_table": null,
+    "foreign_column": null
+  },
+  {
+    "table_name": "tbllotresidents",
+    "constraint_type": "FOREIGN KEY",
+    "column_name": "lotid",
+    "foreign_table": "tbllots",
+    "foreign_column": "lotid"
+  },
+  {
+    "table_name": "tbllotresidents",
+    "constraint_type": "PRIMARY KEY",
+    "column_name": "lotresidentid",
+    "foreign_table": "tbllotresidents",
+    "foreign_column": "lotresidentid"
+  },
+  {
+    "table_name": "tbllotresidents",
+    "constraint_type": "FOREIGN KEY",
+    "column_name": "residentid",
+    "foreign_table": "tblresidents",
+    "foreign_column": "residentid"
+  },
+  {
+    "table_name": "tbllots",
+    "constraint_type": "UNIQUE",
+    "column_name": "lotnumber",
+    "foreign_table": "tbllots",
+    "foreign_column": "phasenumber"
+  },
+  {
+    "table_name": "tbllots",
+    "constraint_type": "UNIQUE",
+    "column_name": "lotnumber",
+    "foreign_table": "tbllots",
+    "foreign_column": "lotnumber"
+  },
+  {
+    "table_name": "tbllots",
+    "constraint_type": "UNIQUE",
+    "column_name": "phasenumber",
+    "foreign_table": "tbllots",
+    "foreign_column": "phasenumber"
+  },
+  {
+    "table_name": "tbllots",
+    "constraint_type": "UNIQUE",
+    "column_name": "phasenumber",
+    "foreign_table": "tbllots",
+    "foreign_column": "lotnumber"
+  },
+  {
+    "table_name": "tbllots",
+    "constraint_type": "PRIMARY KEY",
+    "column_name": "lotid",
+    "foreign_table": "tbllots",
+    "foreign_column": "lotid"
+  },
+  {
+    "table_name": "tbllots",
+    "constraint_type": "FOREIGN KEY",
+    "column_name": "homestyletypeid",
+    "foreign_table": "tblhometypestyles",
+    "foreign_column": "hometypestyleid"
+  },
+  {
+    "table_name": "tbllots",
+    "constraint_type": "CHECK",
+    "column_name": null,
+    "foreign_table": null,
+    "foreign_column": null
+  },
+  {
+    "table_name": "tbllots",
+    "constraint_type": "CHECK",
+    "column_name": null,
+    "foreign_table": null,
+    "foreign_column": null
+  },
+  {
+    "table_name": "tblmapassets",
+    "constraint_type": "PRIMARY KEY",
+    "column_name": "mapassetid",
+    "foreign_table": "tblmapassets",
+    "foreign_column": "mapassetid"
+  },
+  {
+    "table_name": "tblmapassets",
+    "constraint_type": "CHECK",
+    "column_name": null,
+    "foreign_table": null,
+    "foreign_column": null
+  },
+  {
+    "table_name": "tblmapassets",
+    "constraint_type": "CHECK",
+    "column_name": null,
+    "foreign_table": null,
+    "foreign_column": null
+  },
+  {
+    "table_name": "tblnotices",
+    "constraint_type": "FOREIGN KEY",
+    "column_name": "createdby",
+    "foreign_table": null,
+    "foreign_column": null
+  },
+  {
+    "table_name": "tblnotices",
+    "constraint_type": "PRIMARY KEY",
+    "column_name": "noticeid",
+    "foreign_table": "tblnotices",
+    "foreign_column": "noticeid"
+  }
+]
