@@ -268,23 +268,16 @@ console.log("DRAW_GOLF VERSION STAMP: 2026-03-13 FIX C");
     return [a, b];
   }
 
-  function strokeSmoothPath(ctx, pts) {
-    if (!Array.isArray(pts) || pts.length < 2) return;
+function strokeStraightPath(ctx, pts) {
+  if (!Array.isArray(pts) || pts.length < 2) return;
 
-    ctx.beginPath();
-    ctx.moveTo(pts[0].x, pts[0].y);
+  ctx.beginPath();
+  ctx.moveTo(pts[0].x, pts[0].y);
 
-    for (let i = 1; i < pts.length - 1; i++) {
-      const a = pts[i];
-      const b = pts[i + 1];
-      const mx = (a.x + b.x) / 2;
-      const my = (a.y + b.y) / 2;
-      ctx.quadraticCurveTo(a.x, a.y, mx, my);
-    }
-
-    const last = pts[pts.length - 1];
-    ctx.lineTo(last.x, last.y);
+  for (let i = 1; i < pts.length; i++) {
+    ctx.lineTo(pts[i].x, pts[i].y);
   }
+}
 
   function ensureCoursePicker() {
     const data = getData();
@@ -365,12 +358,12 @@ console.log("DRAW_GOLF VERSION STAMP: 2026-03-13 FIX C");
   function strokeRouteRoadStyle(ctx, pts, isSelected) {
     if (!Array.isArray(pts) || pts.length < 2) return;
 
-    strokeSmoothPath(ctx, pts);
+    strokeStraightPath(ctx, pts);
 
     ctx.strokeStyle = "rgba(0,0,0,0.45)";
     ctx.lineWidth = isSelected ? SELECT_ROUTE_W : BASE_ROUTE_W;
-    ctx.lineCap = "round";
-    ctx.lineJoin = "round";
+    ctx.lineCap = "butt";
+    ctx.lineJoin = "miter";
     ctx.stroke();
 
     const innerAlpha = isSelected ? flashAlpha(FLASH_PERIOD_MS, 0.80, 1.00) : 0.95;
