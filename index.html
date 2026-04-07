@@ -3,15 +3,16 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-<meta name="mobile-web-app-capable" content="yes">
-<title>Phase 7 Golf Event</title>
-<link rel="icon" type="image/png" sizes="32x32" href="icon-32.png">
-<link rel="shortcut icon" href="favicon.ico">
-<link rel="apple-touch-icon" href="icon-192.png">
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#0b3d2e">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="Phase7 Golf">
+  <meta name="mobile-web-app-capable" content="yes">
+  <title>Phase 7 Golf Event</title>
+  <link rel="icon" type="image/png" sizes="32x32" href="icon-32.png">
+  <link rel="shortcut icon" href="favicon.ico">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#0b3d2e">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Phase7 Golf">
+
   <style>
 html, body {
   margin: 0;
@@ -19,76 +20,63 @@ html, body {
   overflow: hidden;
   font-family: system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
   background: #111827;
-
   touch-action: manipulation;
   overscroll-behavior: none;
 }
-    * { box-sizing: border-box; }
-    #app{
-      position: fixed;
-      inset: 0;
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-      background: #111827;
-    }
-  #titleRow{
+
+* { box-sizing: border-box; }
+
+#app{
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: #111827;
+}
+
+#titleRow{
   display:flex;
   align-items:baseline;
   gap:10px;
   flex-wrap:wrap;
 }
-    #titleRow h1{margin:0;font-size:16px;line-height:1}
-    #titleRow .sub{font-size:12px;color:#6b7280}
-    .pill{padding:4px 8px;border:1px solid #e5e7eb;border-radius:999px;font-size:12px;background:#f9fafb;}
-    .spacer{flex:1}
-    .switch{
-      display:inline-flex;align-items:center;gap:8px;
-      padding:6px 10px;border:1px solid #e5e7eb;border-radius:999px;background:#f9fafb;
-      font-size:12px; user-select:none;
-    }
-    .switch input{transform:scale(1.1)}
 
-    /* ✅ map area scrolls when content is larger than viewport */
-		#mapWrapper {
-		  position: absolute;
-		  top: 112px;
-		  left: 0;
-		  right: 0;
-		  bottom: 0;
-		  overflow: auto;
-		  -webkit-overflow-scrolling: touch;
-		  overscroll-behavior: contain;
-		  min-height: 0;
-		  touch-action: none;
-		}
-    #mapZoom{
-      position: relative;
-      width: 1500px;
-      height: 1500px;
-      transform-origin: top left;
-    }
+#titleRow h1{
+  margin:0;
+  font-size:16px;
+  line-height:1;
+}
 
-    /* ✅ let canvas define its own layout size so overflow works */
-		#mapCanvas{
-      display: block;
-      width: 1500px;
-      height: 1500px;
-      position: relative;
-      z-index: 1;
-      image-rendering: auto;
-      touch-action: pan-x pan-y;
-    }
+#titleRow .sub{
+  font-size:12px;
+  color:#6b7280;
+}
 
-    #popup{
-      position:absolute;display:none;max-width:340px;background:white;border:1px solid #e5e7eb;border-radius:12px;
-      box-shadow:0 10px 30px rgba(0,0,0,.2);padding:10px;z-index:9999;
-      pointer-events:auto;
-    }
-    #popup.hidden{display:none !important;}
-    #popup h3{margin:0 0 6px 0;font-size:14px}
-    #popup p{margin:0 0 6px 0;font-size:12px;line-height:1.35;color:#111827}
-    #popup button{margin-top:8px}
+.pill{
+  padding:4px 8px;
+  border:1px solid #e5e7eb;
+  border-radius:999px;
+  font-size:12px;
+  background:#f9fafb;
+}
+
+.spacer{flex:1}
+
+.switch{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  padding:6px 10px;
+  border:1px solid #e5e7eb;
+  border-radius:999px;
+  background:#f9fafb;
+  font-size:12px;
+  user-select:none;
+}
+
+.switch input{transform:scale(1.1)}
+
 #mapWrapper {
   position: absolute;
   top: 112px;
@@ -102,18 +90,40 @@ html, body {
   touch-action: pan-x pan-y pinch-zoom;
 }
 
-#popup {
-  position: absolute;
-  display: none;
-  max-width: 340px;
-  background: white;
-  border: 1px solid #e5e7eb;
-  border-radius: 12px;
-  box-shadow: 0 10px 30px rgba(0,0,0,.2);
-  padding: 10px;
-  z-index: 9999;
-  pointer-events: auto;
+#mapZoom{
+  position: relative;
+  width: 1500px;
+  height: 1500px;
+  transform-origin: top left;
 }
+
+#mapCanvas{
+  display: block;
+  width: 1500px;
+  height: 1500px;
+  position: relative;
+  z-index: 1;
+  image-rendering: auto;
+  touch-action: pan-x pan-y;
+}
+
+#popup{
+  position:absolute;
+  display:none;
+  max-width:340px;
+  background:white;
+  border:1px solid #e5e7eb;
+  border-radius:12px;
+  box-shadow:0 10px 30px rgba(0,0,0,.2);
+  padding:10px;
+  z-index:9999;
+  pointer-events:auto;
+}
+
+#popup.hidden{display:none !important;}
+#popup h3{margin:0 0 6px 0;font-size:14px}
+#popup p{margin:0 0 6px 0;font-size:12px;line-height:1.35;color:#111827}
+#popup button{margin-top:8px}
 
 .hole-popup {
   position: fixed;
@@ -194,30 +204,31 @@ html, body {
 </head>
 <body>
   <div id="app">
-<div id="toolbar">
+    <div id="toolbar">
 
-<div id="titleRow">
-  <h1>Phase 7 Golf Event</h1>
-</div>
+      <div id="titleRow">
+        <h1>Phase 7 Golf Event</h1>
+      </div>
 
-<!-- <span class="pill">Server: python -m http.server 8000</span> -->
+      <!-- <span class="pill">Server: python -m http.server 8000</span> -->
 
-  <select id="courseSelect"></select>
-  <select id="holeSelect"></select>
-<!--
-<span class="pill">MODE: <b id="modeLabel"></b></span>
-<span class="pill">Events: <b id="eventsLabel"></b></span>
-<span class="pill">Animations: <b id="animLabel"></b></span>
--->
-  <span class="spacer"></span>
+      <select id="courseSelect"></select>
+      <select id="holeSelect"></select>
 
-  <!-- THIS MOVES TO THE RIGHT -->
-  <label class="switch" title="Resident mode shows resident details in lot popup">
-    <input id="residentModeToggle" type="checkbox"/>
-    <span>Resident Mode</span>
-  </label>
+      <!--
+      <span class="pill">MODE: <b id="modeLabel"></b></span>
+      <span class="pill">Events: <b id="eventsLabel"></b></span>
+      <span class="pill">Animations: <b id="animLabel"></b></span>
+      -->
 
-</div>
+      <span class="spacer"></span>
+
+      <label class="switch" title="Resident mode shows resident details in lot popup">
+        <input id="residentModeToggle" type="checkbox"/>
+        <span>Resident Mode</span>
+      </label>
+
+    </div>
 
     <div id="mapWrapper">
       <div id="mapZoom">
@@ -231,15 +242,13 @@ html, body {
   <script src="phase7_merged_lots.js"></script>
   <script src="mapped_sites.js"></script>
   <script src="events.js"></script>
-  <script src="golf_overlay_data.js"></script>
-
+  <script src="golf_overlay_data.js?v=20260407s1"></script>
 
   <!-- Renderers -->
-<script src="draw_sites.js"></script>
+  <script src="draw_sites.js"></script>
   <script src="draw_lots.js"></script>
   <script src="draw_golf.js"></script>
   <script src="event_engine.js"></script>
-
 
   <!-- Core controller -->
   <script src="map_core.js"></script>
@@ -263,49 +272,45 @@ function updateToolbarLabels() {
   }
 }
 
-    (function bootToolbar() {
-      const toggle = document.getElementById("residentModeToggle");
-      if (!toggle) return;
+(function bootToolbar() {
+  const toggle = document.getElementById("residentModeToggle");
+  if (!toggle) return;
 
-      toggle.checked = (window.MODE === "resident");
-      updateToolbarLabels();
-
-toggle.addEventListener("change", function () {
-
-  if (toggle.checked) {
-
-    if (!sessionStorage.getItem("residentAuth")) {
-
-      const entered = prompt("Resident access password:");
-
-      if (!entered || entered.trim() !== "parrotHead") {
-        alert("Incorrect password");
-        toggle.checked = false;
-        return;
-      }
-
-      sessionStorage.setItem("residentAuth", "true");
-    }
-
-    window.MODE = "resident";
-
-  } else {
-    window.MODE = "event";
-  }
-
+  toggle.checked = (window.MODE === "resident");
   updateToolbarLabels();
 
-  if (typeof window.setAppMode === "function") {
-    window.setAppMode(window.MODE);
-  } else {
-    if (typeof window.safeDrawLots === "function") window.safeDrawLots();
-    else if (typeof window.drawLots === "function") window.drawLots();
-  }
+  toggle.addEventListener("change", function () {
+    if (toggle.checked) {
+      if (!sessionStorage.getItem("residentAuth")) {
+        const entered = prompt("Resident access password:");
 
-});
-    })();
+        if (!entered || entered.trim() !== "parrotHead") {
+          alert("Incorrect password");
+          toggle.checked = false;
+          return;
+        }
+
+        sessionStorage.setItem("residentAuth", "true");
+      }
+
+      window.MODE = "resident";
+    } else {
+      window.MODE = "event";
+    }
+
+    updateToolbarLabels();
+
+    if (typeof window.setAppMode === "function") {
+      window.setAppMode(window.MODE);
+    } else {
+      if (typeof window.safeDrawLots === "function") window.safeDrawLots();
+      else if (typeof window.drawLots === "function") window.drawLots();
+    }
+  });
+})();
   </script>
-<script>
+
+  <script>
 (function initGolfUI() {
   const courseSel = document.getElementById("courseSelect");
   const holeSel = document.getElementById("holeSelect");
@@ -332,12 +337,36 @@ toggle.addEventListener("change", function () {
 function setActive() {
   window.GOLF_ACTIVE_COURSE = courseSel.value || "";
   window.GOLF_ACTIVE_HOLE = holeSel.value ? Number(holeSel.value) : null;
-
-  // Single source of truth for selected golf hole
   window.GOLF_SELECTED_HOLE = holeSel.value ? Number(holeSel.value) : null;
 
   localStorage.setItem("GOLF_ACTIVE_COURSE", window.GOLF_ACTIVE_COURSE);
   localStorage.setItem("GOLF_ACTIVE_HOLE", holeSel.value || "");
+
+  const activeCourse =
+    courses.find(c => c.course_name === window.GOLF_ACTIVE_COURSE || c.name === window.GOLF_ACTIVE_COURSE) ||
+    courses[0] ||
+    null;
+
+  const activeHole =
+    activeCourse && Array.isArray(activeCourse.holes) && window.GOLF_SELECTED_HOLE
+      ? activeCourse.holes.find(h => Number(h.hole_number) === Number(window.GOLF_SELECTED_HOLE))
+      : null;
+
+  if (activeHole) {
+    if (typeof window.centerMapOn === "function") {
+      const fx = Number(activeHole.flag_x);
+      const fy = Number(activeHole.flag_y);
+      if (Number.isFinite(fx) && Number.isFinite(fy)) {
+        window.centerMapOn(fx, fy);
+      }
+    }
+
+    if (typeof window.showHolePopup === "function") {
+      window.showHolePopup(activeHole);
+    }
+  } else if (typeof window.hideHolePopup === "function") {
+    window.hideHolePopup();
+  }
 
   if (typeof window.safeDrawGolf === "function") {
     window.safeDrawGolf();
@@ -349,6 +378,7 @@ function setActive() {
     window.drawLots();
   }
 }
+
   function rebuildHoles() {
     const courseName = courseSel.value;
     const course =
@@ -416,15 +446,76 @@ function setActive() {
     setActive();
   });
 })();
-</script>
-  <div id="holePopup" class="hole-popup hidden">
-  <div class="hole-popup-inner">
-    <h3 id="holeTitle"></h3>
-    <div id="holeText"></div>
-  </div>
-</div>
+  </script>
 
-<script>
+  <div id="holePopup" class="hole-popup hidden">
+    <div class="hole-popup-inner">
+      <h3 id="holeTitle"></h3>
+      <div id="holeText"></div>
+    </div>
+  </div>
+
+  <!-- Hole popup logic -->
+  <script>
+function escapeHtml(value) {
+  return String(value)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+window.showHolePopup = function showHolePopup(hole) {
+  const popup = document.getElementById("holePopup");
+  const title = document.getElementById("holeTitle");
+  const text = document.getElementById("holeText");
+  if (!popup || !title || !text || !hole) return;
+
+  const courseName = String(window.GOLF_ACTIVE_COURSE || "").trim();
+  const holeNum = Number(hole.hole_number) || "";
+  const holeName = String(hole.holename || "").trim();
+  const sponsor = String(hole.sponsor || "").trim();
+
+  const parts = [];
+
+  if (courseName) {
+    parts.push(`<div class="hole-line hole-line-1">${escapeHtml(courseName)}</div>`);
+  }
+
+  if (holeName) {
+    parts.push(`<div class="hole-line hole-line-2">Hole ${holeNum}: ${escapeHtml(holeName)}</div>`);
+  } else if (holeNum !== "") {
+    parts.push(`<div class="hole-line hole-line-2">Hole ${holeNum}</div>`);
+  }
+
+  if (sponsor) {
+    parts.push(`<div class="hole-line hole-line-3">Sponsor: ${escapeHtml(sponsor)}</div>`);
+  }
+
+  const extra = [];
+  if (hole.par != null && hole.par !== "") extra.push(`Par ${escapeHtml(hole.par)}`);
+  if (hole.handicap != null && hole.handicap !== "") extra.push(`Handicap ${escapeHtml(hole.handicap)}`);
+
+  if (extra.length) {
+    parts.push(`<div class="hole-line hole-line-3">${extra.join(" • ")}</div>`);
+  }
+
+  title.textContent = "Hole Details";
+  text.innerHTML = parts.join("");
+  popup.classList.remove("hidden");
+  popup.setAttribute("aria-hidden", "false");
+};
+
+window.hideHolePopup = function hideHolePopup() {
+  const popup = document.getElementById("holePopup");
+  if (!popup) return;
+  popup.classList.add("hidden");
+  popup.setAttribute("aria-hidden", "true");
+};
+  </script>
+
+  <script>
 (function () {
   const BASE_W = 1500;
   const BASE_H = 1500;
@@ -486,7 +577,7 @@ function setActive() {
 
     els.wrapper.addEventListener("touchmove", function (e) {
       if (!(e.touches && e.touches.length === 2) || !startDist || !startZoom) {
-        return; // let one-finger scrolling stay native
+        return;
       }
 
       e.preventDefault();
@@ -537,7 +628,7 @@ function setActive() {
     initMapZoom();
   }
 })();
-</script>
+  </script>
 
 </body>
 </html>
