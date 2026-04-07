@@ -4,6 +4,7 @@
 console.log("DRAW_GOLF LOADED MARKER", new Date().toISOString());
 console.log("DRAW_GOLF VERSION STAMP: 2026-03-13 FIX C");
 
+
 (function () {
   "use strict";
 
