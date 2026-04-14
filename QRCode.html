@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Golf Course Map QR</title>
+  <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(to bottom, #bfe9ff, #e8fdf8, #fff3e0);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .card {
+      background: rgba(255,255,255,0.85);
+      backdrop-filter: blur(6px);
+      border-radius: 30px;
+      padding: 40px;
+      text-align: center;
+      width: 500px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+    }
+
+    h1 {
+      margin: 0 0 10px 0;
+      color: #063634;
+    }
+
+    p {
+      color: #444;
+    }
+
+    #qrcode {
+      margin: 20px auto;
+    }
+
+    .url {
+      font-size: 12px;
+      word-break: break-all;
+      margin-top: 10px;
+    }
+
+    button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      border-radius: 20px;
+      border: none;
+      background: linear-gradient(135deg, #20c997, #60a5fa);
+      color: white;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    @media print {
+      button { display: none; }
+      body { background: white; }
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="card">
+  <h1>Golf Course Map</h1>
+  <p>Scan to open the live course map</p>
+
+  <div id="qrcode"></div>
+
+  <div class="url" id="urlText"></div>
+
+  <button onclick="window.print()">Print</button>
+</div>
+
+<script>
+  // 🔥 CHANGE THIS URL
+  const mapUrl = "https://YOUR-GOLF-MAP-URL-HERE";
+
+  document.getElementById("urlText").innerText = mapUrl;
+
+  QRCode.toCanvas(document.getElementById("qrcode"), mapUrl, {
+    width: 250
+  });
+</script>
+
+</body>
+</html>
