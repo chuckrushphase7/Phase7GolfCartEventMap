@@ -133,7 +133,7 @@ html, body {
   z-index: 999999;
   width: auto;
   max-width: none;
-  max-height: min(34vh, 220px);
+  max-height: min(28vh, 160px);
   overflow: auto;
   box-sizing: border-box;
   background: rgba(255,255,255,.96);
@@ -157,12 +157,6 @@ html, body {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-}
-
-.hole-line-wrap {
-  white-space: normal;
-  overflow: visible;
-  text-overflow: clip;
 }
 
 .hole-line-1 {
@@ -219,7 +213,6 @@ html, body {
       <!-- <span class="pill">Server: python -m http.server 8000</span> -->
 
       <select id="courseSelect"></select>
-      <span id="courseParDisplay" class="pill" title="Course par total">Par --</span>
       <select id="holeSelect"></select>
 
       <!--
@@ -341,29 +334,9 @@ function updateToolbarLabels() {
   }
 
   const courses = Array.isArray(data.courses) ? data.courses : [];
-  const courseParDisplay = document.getElementById("courseParDisplay");
 
   courseSel.innerHTML = "";
   holeSel.innerHTML = "";
-
-  function getCourseByName(courseName) {
-    return courses.find(c => c.course_name === courseName || c.name === courseName) || courses[0] || null;
-  }
-
-  function getCoursePar(course) {
-    if (!course || !Array.isArray(course.holes)) return null;
-    const pars = course.holes
-      .map(h => Number(h.par))
-      .filter(n => Number.isFinite(n));
-    if (!pars.length) return null;
-    return pars.reduce((a, b) => a + b, 0);
-  }
-
-  function updateCourseParDisplay(course) {
-    if (!courseParDisplay) return;
-    const par = getCoursePar(course);
-    courseParDisplay.textContent = Number.isFinite(par) ? `Par ${par}` : "Par --";
-  }
 
 function setActive() {
   window.GOLF_ACTIVE_COURSE = courseSel.value || "";
@@ -373,8 +346,10 @@ function setActive() {
   localStorage.setItem("GOLF_ACTIVE_COURSE", window.GOLF_ACTIVE_COURSE);
   localStorage.setItem("GOLF_ACTIVE_HOLE", holeSel.value || "");
 
-  const activeCourse = getCourseByName(window.GOLF_ACTIVE_COURSE);
-  updateCourseParDisplay(activeCourse);
+  const activeCourse =
+    courses.find(c => c.course_name === window.GOLF_ACTIVE_COURSE || c.name === window.GOLF_ACTIVE_COURSE) ||
+    courses[0] ||
+    null;
 
   const activeHole =
     activeCourse && Array.isArray(activeCourse.holes) && window.GOLF_SELECTED_HOLE
@@ -410,7 +385,9 @@ function setActive() {
 
   function rebuildHoles() {
     const courseName = courseSel.value;
-    const course = getCourseByName(courseName);
+    const course =
+      courses.find(c => c.course_name === courseName || c.name === courseName) ||
+      courses[0];
 
     holeSel.innerHTML = "";
 
@@ -463,7 +440,6 @@ function setActive() {
     courseSel.value = "";
   }
 
-  updateCourseParDisplay(getCourseByName(courseSel.value));
   rebuildHoles();
 
   courseSel.addEventListener("change", function () {
@@ -504,7 +480,6 @@ window.showHolePopup = function showHolePopup(hole) {
   const holeNum = Number(hole.hole_number) || "";
   const holeName = String(hole.holename || "").trim();
   const sponsor = String(hole.sponsor || "").trim();
-  const yards = hole.yards != null && hole.yards !== "" ? Number(hole.yards) : null;
 
   const parts = [];
 
@@ -519,16 +494,15 @@ window.showHolePopup = function showHolePopup(hole) {
   }
 
   if (sponsor) {
-    parts.push(`<div class="hole-line hole-line-3 hole-line-wrap">Sponsor: ${escapeHtml(sponsor)}</div>`);
+    parts.push(`<div class="hole-line hole-line-3">Sponsor: ${escapeHtml(sponsor)}</div>`);
   }
 
   const extra = [];
   if (hole.par != null && hole.par !== "") extra.push(`Par ${escapeHtml(hole.par)}`);
-  if (yards !== null && Number.isFinite(yards)) extra.push(`${escapeHtml(yards)} yds`);
   if (hole.handicap != null && hole.handicap !== "") extra.push(`Handicap ${escapeHtml(hole.handicap)}`);
 
   if (extra.length) {
-    parts.push(`<div class="hole-line hole-line-3 hole-line-wrap">${extra.join(" • ")}</div>`);
+    parts.push(`<div class="hole-line hole-line-3">${extra.join(" • ")}</div>`);
   }
 
   title.textContent = "Hole Details";
